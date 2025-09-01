@@ -4,6 +4,17 @@
  * This file contains all the JavaScript functionality for the Driving Classic website.
  * Update this file in Cursor and push to GitHub to deploy changes.
  * 
+ * IMPORTANT: Before this script, you must include Locomotive Scroll in your Webflow project:
+ * 
+ * 1. Go to Site Settings → Custom Code → Head Code
+ * 2. Add these scripts BEFORE your driving-classic.js:
+ * 
+ * <!-- CSS (Locomotive V5 is based on Lenis) -->
+ * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.2.3/dist/lenis.css">
+ * 
+ * <!-- JS -->
+ * <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@beta/bundled/locomotive-scroll.min.js"></script>
+ * 
  * Last Updated: 01/09/2025 12:37 PM
  * Version: 1.0.0
  */
@@ -42,26 +53,32 @@
     }
     
     /**
-     * Setup smooth scrolling for navigation links
+     * Setup Locomotive Scroll for smooth scrolling
      */
     function setupSmoothScrolling() {
-        const navLinks = document.querySelectorAll('a[href^="#"]');
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+        // Check if Locomotive Scroll is available
+        if (typeof LocomotiveScroll === 'undefined') {
+            console.warn('Locomotive Scroll not loaded. Make sure to include the script in your Webflow project.');
+            return;
+        }
+
+        try {
+            // Initialize Locomotive Scroll
+            const locomotiveScroll = new LocomotiveScroll({
+                lenisOptions: {
+                    lerp: 0.1,
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                 }
             });
-        });
+
+            // Store reference globally for access
+            window.DrivingClassic.locomotiveScroll = locomotiveScroll;
+
+            console.log('Locomotive Scroll initialized successfully');
+        } catch (error) {
+            console.error('Error initializing Locomotive Scroll:', error);
+        }
     }
     
     /**
@@ -414,7 +431,8 @@
                     console.log(`Element ${i}:`, el, `Items:`, items);
                 });
             }
-        }
+        },
+        locomotiveScroll: null // Will be set when Locomotive Scroll initializes
     };
     
 })();
