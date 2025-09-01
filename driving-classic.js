@@ -28,6 +28,9 @@
         // Initialize navigation system
         initNavigation();
         
+        // Initialize image cycling system
+        initImageCycle();
+        
         // Example: Add smooth scrolling to navigation links
         setupSmoothScrolling();
         
@@ -317,6 +320,56 @@
         });
     }
     
+    /**
+     * Image Cycling System
+     * Automatically cycles through images with intersection observer for performance
+     */
+    function initImageCycle() {
+        document.querySelectorAll("[data-image-cycle]").forEach(cycleElement => {
+            const items = cycleElement.querySelectorAll("[data-image-cycle-item]");
+            if (items.length < 2) return;
+
+            let currentIndex = 0;
+            let intervalId;
+
+            // Get optional custom duration (in seconds), fallback to 2000ms
+            const attrValue = cycleElement.getAttribute("data-image-cycle");
+            const duration = attrValue && !isNaN(attrValue) ? parseFloat(attrValue) * 1000 : 2000;
+            const isTwoItems = items.length === 2;
+
+            // Initial state
+            items.forEach((item, i) => {
+                item.setAttribute("data-image-cycle-item", i === 0 ? "active" : "not-active");
+            });
+
+            function cycleImages() {
+                const prevIndex = currentIndex;
+                currentIndex = (currentIndex + 1) % items.length;
+
+                items[prevIndex].setAttribute("data-image-cycle-item", "previous");
+
+                if (!isTwoItems) {
+                    setTimeout(() => {
+                        items[prevIndex].setAttribute("data-image-cycle-item", "not-active");
+                    }, duration);
+                }
+
+                items[currentIndex].setAttribute("data-image-cycle-item", "active");
+            }
+
+            const observer = new IntersectionObserver(([entry]) => {
+                if (entry.isIntersecting && !intervalId) {
+                    intervalId = setInterval(cycleImages, duration);
+                } else {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            }, { threshold: 0 });
+
+            observer.observe(cycleElement);
+        });
+    }
+    
     // Make functions available globally if needed
     window.DrivingClassic = {
         init: initDrivingClassic,
@@ -328,6 +381,9 @@
             init: initNavigation,
             initMobile: initMobileMenu,
             initDesktop: initDesktopDropdowns
+        },
+        imageCycle: {
+            init: initImageCycle
         }
     };
     
