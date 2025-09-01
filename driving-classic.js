@@ -325,9 +325,19 @@
      * Automatically cycles through images with intersection observer for performance
      */
     function initImageCycle() {
-        document.querySelectorAll("[data-image-cycle]").forEach(cycleElement => {
+        console.log('Initializing image cycle system...');
+        
+        const cycleElements = document.querySelectorAll("[data-image-cycle]");
+        console.log('Found cycle elements:', cycleElements.length);
+        
+        cycleElements.forEach((cycleElement, index) => {
             const items = cycleElement.querySelectorAll("[data-image-cycle-item]");
-            if (items.length < 2) return;
+            console.log(`Cycle element ${index}: ${items.length} items found`);
+            
+            if (items.length < 2) {
+                console.log(`Cycle element ${index}: Skipping - need at least 2 items`);
+                return;
+            }
 
             let currentIndex = 0;
             let intervalId;
@@ -336,15 +346,21 @@
             const attrValue = cycleElement.getAttribute("data-image-cycle");
             const duration = attrValue && !isNaN(attrValue) ? parseFloat(attrValue) * 1000 : 2000;
             const isTwoItems = items.length === 2;
+            
+            console.log(`Cycle element ${index}: Duration set to ${duration}ms, Two items: ${isTwoItems}`);
 
             // Initial state
             items.forEach((item, i) => {
-                item.setAttribute("data-image-cycle-item", i === 0 ? "active" : "not-active");
+                const state = i === 0 ? "active" : "not-active";
+                item.setAttribute("data-image-cycle-item", state);
+                console.log(`Item ${i}: Set to ${state}`);
             });
 
             function cycleImages() {
                 const prevIndex = currentIndex;
                 currentIndex = (currentIndex + 1) % items.length;
+                
+                console.log(`Cycling: ${prevIndex} -> ${currentIndex}`);
 
                 items[prevIndex].setAttribute("data-image-cycle-item", "previous");
 
@@ -359,15 +375,20 @@
 
             const observer = new IntersectionObserver(([entry]) => {
                 if (entry.isIntersecting && !intervalId) {
+                    console.log(`Cycle element ${index}: Starting cycle (visible)`);
                     intervalId = setInterval(cycleImages, duration);
-                } else {
+                } else if (!entry.isIntersecting && intervalId) {
+                    console.log(`Cycle element ${index}: Stopping cycle (not visible)`);
                     clearInterval(intervalId);
                     intervalId = null;
                 }
             }, { threshold: 0 });
 
             observer.observe(cycleElement);
+            console.log(`Cycle element ${index}: Observer attached`);
         });
+        
+        console.log('Image cycle system initialization complete');
     }
     
     // Make functions available globally if needed
@@ -383,7 +404,16 @@
             initDesktop: initDesktopDropdowns
         },
         imageCycle: {
-            init: initImageCycle
+            init: initImageCycle,
+            test: function() {
+                console.log('Testing image cycle system...');
+                const elements = document.querySelectorAll('[data-image-cycle]');
+                console.log('Elements with data-image-cycle:', elements);
+                elements.forEach((el, i) => {
+                    const items = el.querySelectorAll('[data-image-cycle-item]');
+                    console.log(`Element ${i}:`, el, `Items:`, items);
+                });
+            }
         }
     };
     
