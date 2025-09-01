@@ -449,6 +449,11 @@
             document.fonts.ready.then(function () {
                 console.log('Fonts loaded, initializing text reveal...');
                 
+                // Set initial state for all headings
+                document.querySelectorAll('[data-split="heading"]').forEach(heading => {
+                    gsap.set(heading, { visibility: 'visible' });
+                });
+                
                 document.querySelectorAll('[data-split="heading"]').forEach(heading => {
                     // Find the split type, default is 'lines'
                     const type = heading.dataset.splitReveal || 'lines';
@@ -469,17 +474,27 @@
                             const targets = instance[type]; // Register animation targets
                             const config = splitConfig[type]; // Find matching duration and stagger
                             
-                            return gsap.from(targets, {
-                                yPercent: 110,
-                                duration: config.duration,
-                                stagger: config.stagger,
-                                ease: 'expo.out',
-                                scrollTrigger: {
-                                    trigger: heading,
-                                    start: 'clamp(top 80%)',
-                                    once: true
+                            // Set initial state and animate
+                            return gsap.fromTo(targets, 
+                                {
+                                    yPercent: 110,
+                                    opacity: 0,
+                                    visibility: 'hidden'
+                                },
+                                {
+                                    yPercent: 0,
+                                    opacity: 1,
+                                    visibility: 'visible',
+                                    duration: config.duration,
+                                    stagger: config.stagger,
+                                    ease: 'expo.out',
+                                    scrollTrigger: {
+                                        trigger: heading,
+                                        start: 'clamp(top 80%)',
+                                        once: true
+                                    }
                                 }
-                            });
+                            );
                         }
                     });
                 });
