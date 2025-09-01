@@ -575,7 +575,8 @@
                     onChange: (element, index) => {
                         currentIndex = index;
                         
-                        if (activeElement) activeElement.classList.remove("active");
+                        // Remove active class from all slides and add to current
+                        slides.forEach(slide => slide.classList.remove("active"));
                         element.classList.add("active");
                         activeElement = element;
 
@@ -595,6 +596,12 @@
                 
                 // On initialization, center the slider
                 loop.toIndex(2, { duration: 0.01 });
+                
+                // Set initial active state
+                if (slides[2]) {
+                    slides[2].classList.add("active");
+                    activeElement = slides[2];
+                }
 
                 function startAutoplay() {
                     if (autoplayDuration > 0 && !autoplay) {
