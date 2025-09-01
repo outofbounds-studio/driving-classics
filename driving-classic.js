@@ -614,22 +614,30 @@
                         console.log('Timeline update detected:', currentSlideIndex, 'Previous:', currentIndex);
                         currentIndex = currentSlideIndex;
                         
-                        // Remove active class from all slides
-                        slides.forEach(slide => slide.classList.remove("active"));
+                        // IMPORTANT: Remove active class from ALL slides first
+                        slides.forEach(slide => {
+                            slide.classList.remove("active");
+                        });
                         
-                        // Add active class to current slide
+                        // Add active class to ONLY the current slide
                         if (slides[currentSlideIndex]) {
                             slides[currentSlideIndex].classList.add("active");
                             activeElement = slides[currentSlideIndex];
-                            console.log('Active slide updated via timeline:', slides[currentSlideIndex]);
+                            console.log('Active slide updated via timeline:', slides[currentSlideIndex], 'Index:', currentSlideIndex);
                         }
                         
                         // Update bullets if they exist
                         if (bullets && bullets.length > 0) {
                             bullets.forEach((bullet, i) => {
-                                bullet.classList.toggle("active", i === currentSlideIndex);
-                                bullet.setAttribute("aria-selected", i === currentSlideIndex ? "true" : "false");
+                                bullet.classList.remove("active");
+                                bullet.setAttribute("aria-selected", "false");
                             });
+                            
+                            // Set only the current bullet as active
+                            if (bullets[currentSlideIndex]) {
+                                bullets[currentSlideIndex].classList.add("active");
+                                bullets[currentSlideIndex].setAttribute("aria-selected", "true");
+                            }
                         }
                     }
                 });
