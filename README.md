@@ -11,16 +11,16 @@ This repository contains the JavaScript functionality for the Driving Classic We
 
 ### 1. GitHub Repository Setup
 
-1. Create a new GitHub repository named `driving-classic` or similar
-2. Push this code to the repository
-3. Get the raw GitHub link for the JavaScript file
+✅ **Repository Created**: [https://github.com/outofbounds-studio/driving-classics](https://github.com/outofbounds-studio/driving-classics)
+✅ **Code Pushed**: All files are now available on GitHub
+✅ **Raw Link Ready**: Use the link below for Webflow integration
 
 ### 2. Webflow Integration
 
 1. In your Webflow project, go to **Site Settings**
 2. Navigate to **Custom Code**
 3. Add the GitHub raw link to the **Head Code** section
-4. The link format should be: `https://raw.githubusercontent.com/[username]/[repository]/main/driving-classic.js`
+4. **Use this exact link**: `https://raw.githubusercontent.com/outofbounds-studio/driving-classics/main/driving-classic.js`
 
 ### 3. Development Workflow
 
