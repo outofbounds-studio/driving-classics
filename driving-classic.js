@@ -573,12 +573,15 @@
                     draggable: true,
                     center: true,
                     onChange: (element, index) => {
+                        console.log('onChange called:', index, element);
                         currentIndex = index;
                         
                         // Remove active class from all slides and add to current
                         slides.forEach(slide => slide.classList.remove("active"));
                         element.classList.add("active");
                         activeElement = element;
+                        
+                        console.log('Active slide updated:', element, 'Classes:', element.classList.toString());
 
                         if (bullets && bullets.length > 0) {
                             if (activeBullet) activeBullet.classList.remove("active");
@@ -601,7 +604,35 @@
                 if (slides[2]) {
                     slides[2].classList.add("active");
                     activeElement = slides[2];
+                    console.log('Initial active slide set:', slides[2], 'Classes:', slides[2].classList.toString());
                 }
+                
+                // Add event listener to track timeline progress and update active slide
+                loop.eventCallback("onUpdate", function() {
+                    const currentSlideIndex = loop.closestIndex();
+                    if (currentSlideIndex !== currentIndex) {
+                        console.log('Timeline update detected:', currentSlideIndex, 'Previous:', currentIndex);
+                        currentIndex = currentSlideIndex;
+                        
+                        // Remove active class from all slides
+                        slides.forEach(slide => slide.classList.remove("active"));
+                        
+                        // Add active class to current slide
+                        if (slides[currentSlideIndex]) {
+                            slides[currentSlideIndex].classList.add("active");
+                            activeElement = slides[currentSlideIndex];
+                            console.log('Active slide updated via timeline:', slides[currentSlideIndex]);
+                        }
+                        
+                        // Update bullets if they exist
+                        if (bullets && bullets.length > 0) {
+                            bullets.forEach((bullet, i) => {
+                                bullet.classList.toggle("active", i === currentSlideIndex);
+                                bullet.setAttribute("aria-selected", i === currentSlideIndex ? "true" : "false");
+                            });
+                        }
+                    }
+                });
 
                 function startAutoplay() {
                     if (autoplayDuration > 0 && !autoplay) {
@@ -922,7 +953,29 @@
                     const slides = el.querySelectorAll('[data-centered-slider="slide"]');
                     const bullets = el.querySelectorAll('[data-centered-slider="bullet"]');
                     console.log(`Slider ${i}:`, el, `Slides:`, slides.length, `Bullets:`, bullets.length);
+                    
+                    // Check active states
+                    slides.forEach((slide, j) => {
+                        console.log(`Slide ${j}:`, slide, 'Active:', slide.classList.contains('active'), 'Classes:', slide.classList.toString());
+                    });
+                    
+                    if (bullets.length > 0) {
+                        bullets.forEach((bullet, j) => {
+                            console.log(`Bullet ${j}:`, bullet, 'Active:', bullet.classList.contains('active'), 'Classes:', bullet.classList.toString());
+                        });
+                    }
                 });
+            },
+            forceActive: function(sliderIndex, slideIndex) {
+                const sliders = document.querySelectorAll('[data-centered-slider="wrapper"]');
+                if (sliders[sliderIndex]) {
+                    const slides = sliders[sliderIndex].querySelectorAll('[data-centered-slider="slide"]');
+                    if (slides[slideIndex]) {
+                        slides.forEach(slide => slide.classList.remove("active"));
+                        slides[slideIndex].classList.add("active");
+                        console.log(`Forced slide ${slideIndex} to active in slider ${sliderIndex}`);
+                    }
+                }
             }
         },
         locomotiveScroll: null, // Will be set when Locomotive Scroll initializes
