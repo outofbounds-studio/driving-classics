@@ -597,15 +597,19 @@
                     }
                 });
                 
-                // On initialization, center the slider to the middle slide
-                const centerIndex = Math.floor(slides.length / 2);
+                // For 3-slide display, we want to center on the middle of visible slides
+                // Since we show 3 slides, the visual center should be slide 1 of the visible 3
+                const visibleSlides = 3;
+                const centerIndex = Math.floor(visibleSlides / 2); // This will be 1 (middle of 3)
+                
+                // On initialization, center the slider to the visual center
                 loop.toIndex(centerIndex, { duration: 0.01 });
                 
-                // Set initial active state to center slide
+                // Set initial active state to visual center slide
                 if (slides[centerIndex]) {
                     slides[centerIndex].classList.add("active");
                     activeElement = slides[centerIndex];
-                    console.log('Initial active slide set to center:', slides[centerIndex], 'Index:', centerIndex);
+                    console.log('Initial active slide set to visual center:', slides[centerIndex], 'Index:', centerIndex, '(middle of 3 visible slides)');
                 }
                 
                 // Add event listener to track timeline progress and update active slide
