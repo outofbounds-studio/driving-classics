@@ -1,712 +1,456 @@
 /**
- * Driving Classic - Webflow Website JavaScript
+ * Driving Classic - Webflow Integration
  * 
  * This file contains all the JavaScript functionality for the Driving Classic website.
- * Update this file in Cursor and push to GitHub to deploy changes.
+ * It's designed to be loaded via GitHub Pages and integrated with Webflow.
  * 
- * IMPORTANT: Before this script, you must include these required libraries in your Webflow project:
- * 
- * 1. Go to Site Settings → Custom Code → Head Code
- * 2. Add these scripts BEFORE your driving-classic.js:
- * 
- * <!-- CSS (Locomotive V5 is based on Lenis) -->
- * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.2.3/dist/lenis.css">
- * 
- * <!-- GSAP Core and Plugins -->
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/InertiaPlugin.min.js"></script>
- * <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
- * 
- * <!-- JS -->
- * <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@beta/bundled/locomotive-scroll.min.js"></script>
- * 
- * Last Updated: 01/09/2025 12:37 PM
- * Version: 1.0.0
+ * External Dependencies (add to Webflow Head Code):
+ * - Locomotive Scroll: https://cdn.jsdelivr.net/npm/lenis@1.2.3/dist/lenis.css
+ * - Locomotive Scroll JS: https://cdn.jsdelivr.net/npm/locomotive-scroll@beta/bundled/locomotive-scroll.min.js
+ * - GSAP: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js
+ * - ScrollTrigger: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js
+ * - SplitText: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js
+ * - Draggable: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js
+ * - InertiaPlugin: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/InertiaPlugin.min.js
+ * - CustomEase: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js
  */
 
 (function() {
     'use strict';
-    
-    // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Driving Classic website loaded successfully');
-        
-        // Initialize all functionality
-        initDrivingClassic();
-    });
-    
-    /**
-     * Main initialization function
-     */
+
+    // Register GSAP plugins
+    gsap.registerPlugin(CustomEase, ScrollTrigger, Draggable, InertiaPlugin);
+
+    // Create custom ease
+    CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
+
+    // Main initialization function
     function initDrivingClassic() {
-        // Add your custom functionality here
-        
-        // Initialize navigation system
-        initNavigation();
-        
-        // Initialize image cycling system
-        initImageCycle();
-        
-        // Initialize masked text reveal system
-        initMaskedTextReveal();
-        
-        // Initialize centered looping sliders
-        initSliders();
-        
-        // Example: Add smooth scrolling to navigation links
-        setupSmoothScrolling();
-        
-        // Example: Initialize any custom components
-        // setupCustomComponents();
-        
-        // Example: Add event listeners
-        // setupEventListeners();
-    }
-    
-    /**
-     * Setup Locomotive Scroll for smooth scrolling
-     */
-    function setupSmoothScrolling() {
-        // Wait a bit for Locomotive Scroll to load
-        setTimeout(() => {
-            // Check if Locomotive Scroll is available
-            if (typeof LocomotiveScroll === 'undefined') {
-                console.warn('Locomotive Scroll not loaded. Make sure to include the script in your Webflow project.');
-                return;
-            }
-
-            try {
-                // Initialize Locomotive Scroll
-                const locomotiveScroll = new LocomotiveScroll({
-                    lenisOptions: {
-                        lerp: 0.1,
-                        duration: 1.2,
-                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    }
-                });
-
-                // Store reference globally for access
-                window.DrivingClassic.locomotiveScroll = locomotiveScroll;
-
-                console.log('Locomotive Scroll initialized successfully');
-                
-                // Test smooth scrolling
-                console.log('Testing smooth scroll functionality...');
-                
-            } catch (error) {
-                console.error('Error initializing Locomotive Scroll:', error);
-            }
-        }, 100); // Wait 100ms for scripts to load
-    }
-    
-    /**
-     * Example function for custom components
-     * Uncomment and modify as needed
-     */
-    /*
-    function setupCustomComponents() {
-        // Add your custom component initialization here
-        console.log('Custom components initialized');
-    }
-    */
-    
-    /**
-     * Example function for event listeners
-     * Uncomment and modify as needed
-     */
-    /*
-    function setupEventListeners() {
-        // Add your custom event listeners here
-        console.log('Event listeners setup complete');
-    }
-    */
-    
-    /**
-     * Utility function to check if element is in viewport
-     */
-    function isElementInViewport(el) {
-        const rect = el.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
-    }
-    
-    /**
-     * Utility function to debounce function calls
-     */
-    function debounce(func, wait, immediate) {
-        let timeout;
-        return function executedFunction() {
-            const context = this;
-            const args = arguments;
-            const later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            const callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
-    
-    /**
-     * Navigation System
-     * Handles mobile and desktop navigation with dropdowns
-     */
-    function initNavigation() {
-        if (!initNavigation._hasResizeListener) {
-            initNavigation._hasResizeListener = true;
-            window.addEventListener('resize', debounce(initNavigation, 200));
+        try {
+            console.log('Driving Classic website loaded successfully');
+            
+            // Initialize all systems
+            initNavigation();
+            initImageCycle();
+            setupSmoothScrolling();
+            initMaskedTextReveal();
+            initSliders();
+            
+        } catch (error) {
+            console.error('Error initializing Driving Classic:', error);
         }
+    }
 
-        const isMobile = window.innerWidth < 768;
-        if (isMobile && initNavigation._lastMode !== 'mobile') {
+    // Navigation system
+    function initNavigation() {
+        try {
             initMobileMenu();
-            initNavigation._lastMode = 'mobile';
-        } else if (!isMobile && initNavigation._lastMode !== 'desktop') {
             initDesktopDropdowns();
-            initNavigation._lastMode = 'desktop';
+            console.log('Navigation system initialized');
+        } catch (error) {
+            console.error('Error initializing navigation:', error);
         }
     }
 
     function initMobileMenu() {
-        const btn = document.querySelector('[data-menu-button]');
-        const nav = document.querySelector('[data-menu-status]');
-        if (!btn || !nav) return;
-
-        btn.setAttribute('aria-expanded', 'false');
-        btn.setAttribute('aria-controls', 'mobile-navigation');
-        nav.setAttribute('id', 'mobile-navigation');
-        nav.setAttribute('role', 'navigation');
-        nav.setAttribute('aria-label', 'Main navigation');
-
-        if (!btn._mobileClick) {
-            btn._mobileClick = true;
-            btn.addEventListener('click', () => {
-                const open = nav.dataset.menuStatus === 'open';
-                nav.dataset.menuStatus = open ? 'closed' : 'open';
-                btn.setAttribute('aria-expanded', !open);
-            });
-        }
-
-        Array.from(document.querySelectorAll('[data-dropdown-toggle]')).forEach((toggle, i) => {
-            const dd = toggle.nextElementSibling;
-            if (!dd || !dd.classList.contains('nav-dropdown')) return;
-            if (toggle._mobileDropdownInit) return;
-            toggle._mobileDropdownInit = true;
-
-            toggle.setAttribute('aria-expanded', 'false');
-            toggle.setAttribute('aria-haspopup', 'true');
-            toggle.setAttribute('aria-controls', `dropdown-${i}`);
-            
-            dd.setAttribute('id', `dropdown-${i}`);
-            dd.setAttribute('role', 'menu');
-            dd.querySelectorAll('.nav-dropdown__link')
-                .forEach(link => link.setAttribute('role', 'menuitem'));
-
-            toggle.addEventListener('click', () => {
-                const open = toggle.dataset.dropdownToggle === 'open';
-                Array.from(document.querySelectorAll('[data-dropdown-toggle]'))
-                    .forEach(other => {
-                        if (other !== toggle) {
-                            other.dataset.dropdownToggle = 'closed';
-                            other.setAttribute('aria-expanded', 'false');
-                            if (other === document.activeElement) other.blur();
-                        }
-                    });
-                toggle.dataset.dropdownToggle = open ? 'closed' : 'open';
-                toggle.setAttribute('aria-expanded', !open);
-                if (open && toggle === document.activeElement) toggle.blur();
+        const menuButtons = document.querySelectorAll('[data-menu-button]');
+        
+        menuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const menuStatus = button.getAttribute('data-menu-status');
+                const targetMenu = button.getAttribute('data-menu-target');
+                
+                if (menuStatus === 'closed') {
+                    button.setAttribute('data-menu-status', 'open');
+                    if (targetMenu) {
+                        const menu = document.querySelector(targetMenu);
+                        if (menu) menu.style.display = 'block';
+                    }
+                } else {
+                    button.setAttribute('data-menu-status', 'closed');
+                    if (targetMenu) {
+                        const menu = document.querySelector(targetMenu);
+                        if (menu) menu.style.display = 'none';
+                    }
+                }
             });
         });
     }
 
     function initDesktopDropdowns() {
-        const toggles = Array.from(document.querySelectorAll('[data-dropdown-toggle]'));
-        const links = Array.from(document.querySelectorAll('.nav-link:not([data-dropdown-toggle])'));
-
-        toggles.forEach((toggle, i) => {
-            const dd = toggle.nextElementSibling;
-            if (!dd || !dd.classList.contains('nav-dropdown') || toggle._desktopInit) return;
-            toggle._desktopInit = true;
-
-            toggle.setAttribute('aria-expanded', 'false');
-            toggle.setAttribute('aria-haspopup', 'true');
-            toggle.setAttribute('aria-controls', `desktop-dropdown-${i}`);
-            
-            dd.setAttribute('id', `desktop-dropdown-${i}`);
-            dd.setAttribute('role', 'menu');
-            dd.setAttribute('aria-hidden', 'true');
-            dd.querySelectorAll('.nav-dropdown__link')
-                .forEach(link => link.setAttribute('role', 'menuitem'));
-
-            toggle.addEventListener('click', e => {
-                e.preventDefault();
-                toggles.forEach(other => {
-                    if (other !== toggle) {
-                        other.dataset.dropdownToggle = 'closed';
-                        other.setAttribute('aria-expanded', 'false');
-                        const otherDropdown = other.nextElementSibling;
-                        if (otherDropdown) otherDropdown.setAttribute('aria-hidden', 'true');
-                    }
-                });
-                const open = toggle.dataset.dropdownToggle !== 'open';
-                toggle.dataset.dropdownToggle = 'open';
-                toggle.setAttribute('aria-expanded', 'true');
-                dd.setAttribute('aria-hidden', 'false');
-                if (open) {
-                    const first = dd.querySelector('.nav-dropdown__link');
-                    if (first) first.focus();
-                }
-            });
-
+        const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+        
+        dropdownToggles.forEach(toggle => {
             toggle.addEventListener('mouseenter', () => {
-                const anyOpen = toggles.some(x => x.dataset.dropdownToggle === 'open');
-                toggles.forEach(other => {
-                    if (other !== toggle) {
-                        other.dataset.dropdownToggle = 'closed';
-                        other.setAttribute('aria-expanded', 'false');
-                        const otherDropdown = other.nextElementSibling;
-                        if (otherDropdown) otherDropdown.setAttribute('aria-hidden', 'true');
+                const dropdown = toggle.querySelector('.nav-dropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'block';
+                }
+            });
+            
+            toggle.addEventListener('mouseleave', () => {
+                const dropdown = toggle.querySelector('.nav-dropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Image cycle system
+    function initImageCycle() {
+        try {
+            console.log('Initializing image cycle system...');
+            
+            const cycleElements = document.querySelectorAll('[data-image-cycle]');
+            console.log('Found cycle elements:', cycleElements.length);
+            
+            cycleElements.forEach((cycleElement, index) => {
+                const items = cycleElement.querySelectorAll('[data-image-cycle-item]');
+                console.log(`Cycle element ${index}:`, items.length, 'items found');
+                
+                if (items.length === 0) return;
+                
+                // Get cycle settings
+                const duration = parseInt(cycleElement.getAttribute('data-image-cycle-duration')) || 3000;
+                const twoItems = cycleElement.getAttribute('data-image-cycle-two-items') === 'true';
+                
+                console.log(`Cycle element ${index}: Duration set to ${duration}ms, Two items: ${twoItems}`);
+                
+                // Set initial states
+                items.forEach((item, i) => {
+                    if (i === 0) {
+                        item.setAttribute('data-image-cycle-item', 'active');
+                        console.log(`Item ${i}: Set to active`);
+                    } else {
+                        item.setAttribute('data-image-cycle-item', 'not-active');
+                        console.log(`Item ${i}: Set to not-active`);
                     }
                 });
-                if (anyOpen) {
-                    setTimeout(() => {
-                        toggle.dataset.dropdownToggle = 'open';
-                        toggle.setAttribute('aria-expanded', 'true');
-                        dd.setAttribute('aria-hidden', 'false');
-                    }, 20);
-                } else {
-                    toggle.dataset.dropdownToggle = 'open';
-                    toggle.setAttribute('aria-expanded', 'true');
-                    dd.setAttribute('aria-hidden', 'false');
-                }
-            });
-
-            dd.addEventListener('mouseleave', () => {
-                toggle.dataset.dropdownToggle = 'closed';
-                toggle.setAttribute('aria-expanded', 'false');
-                dd.setAttribute('aria-hidden', 'true');
-            });
-
-            toggle.addEventListener('keydown', e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggle.click();
-                } else if (e.key === 'Escape') {
-                    toggle.dataset.dropdownToggle = 'closed';
-                    toggle.setAttribute('aria-expanded', 'false');
-                    dd.setAttribute('aria-hidden', 'true');
-                    toggle.focus();
-                }
-            });
-
-            dd.addEventListener('keydown', e => {
-                const items = Array.from(dd.querySelectorAll('.nav-dropdown__link'));
-                const idx = items.indexOf(document.activeElement);
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    items[(idx + 1) % items.length].focus();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    items[(idx - 1 + items.length) % items.length].focus();
-                } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    toggle.dataset.dropdownToggle = 'closed';
-                    toggle.setAttribute('aria-expanded', 'false');
-                    dd.setAttribute('aria-hidden', 'true');
-                        toggle.focus();
-                } else if (e.key === 'Tab' && !dd.contains(e.relatedTarget)) {
-                    toggle.dataset.dropdownToggle = 'closed';
-                    toggle.setAttribute('aria-expanded', 'false');
-                    dd.setAttribute('aria-hidden', 'true');
-                }
-            });
-        });
-
-        links.forEach(link => {
-            link.addEventListener('mouseenter', () => {
-                toggles.forEach(toggle => {
-                    toggle.dataset.dropdownToggle = 'closed';
-                    toggle.setAttribute('aria-expanded', 'false');
-                    const dd = toggle.nextElementSibling;
-                    if (dd) dd.setAttribute('aria-hidden', 'true');
-                });
-            });
-        });
-
-        document.addEventListener('click', e => {
-            const inside = toggles.some(toggle => {
-                const dd = toggle.nextElementSibling;
-                return toggle.contains(e.target) || (dd && dd.contains(e.target));
-            });
-            if (!inside) {
-                toggles.forEach(toggle => {
-                    toggle.dataset.dropdownToggle = 'closed';
-                    toggle.setAttribute('aria-expanded', 'false');
-                    const dd = toggle.nextElementSibling;
-                    if (dd) dd.setAttribute('aria-hidden', 'true');
-                });
-            }
-        });
-    }
-    
-    /**
-     * Image Cycling System
-     * Automatically cycles through images with intersection observer for performance
-     */
-    function initImageCycle() {
-        console.log('Initializing image cycle system...');
-        
-        const cycleElements = document.querySelectorAll("[data-image-cycle]");
-        console.log('Found cycle elements:', cycleElements.length);
-        
-        cycleElements.forEach((cycleElement, index) => {
-            const items = cycleElement.querySelectorAll("[data-image-cycle-item]");
-            console.log(`Cycle element ${index}: ${items.length} items found`);
-            
-            if (items.length < 2) {
-                console.log(`Cycle element ${index}: Skipping - need at least 2 items`);
-                return;
-            }
-
-            let currentIndex = 0;
-            let intervalId;
-
-            // Get optional custom duration (in seconds), fallback to 2000ms
-            const attrValue = cycleElement.getAttribute("data-image-cycle");
-            const duration = attrValue && !isNaN(attrValue) ? parseFloat(attrValue) * 1000 : 2000;
-            const isTwoItems = items.length === 2;
-            
-            console.log(`Cycle element ${index}: Duration set to ${duration}ms, Two items: ${isTwoItems}`);
-
-            // Initial state
-            items.forEach((item, i) => {
-                const state = i === 0 ? "active" : "not-active";
-                item.setAttribute("data-image-cycle-item", state);
-                console.log(`Item ${i}: Set to ${state}`);
-            });
-
-            function cycleImages() {
-                const prevIndex = currentIndex;
-                currentIndex = (currentIndex + 1) % items.length;
                 
-                console.log(`Cycling: ${prevIndex} -> ${currentIndex}`);
-
-                items[prevIndex].setAttribute("data-image-cycle-item", "previous");
-
-                if (!isTwoItems) {
-                    setTimeout(() => {
-                        items[prevIndex].setAttribute("data-image-cycle-item", "not-active");
-                    }, duration);
-                }
-
-                items[currentIndex].setAttribute("data-image-cycle-item", "active");
-            }
-
-            const observer = new IntersectionObserver(([entry]) => {
-                if (entry.isIntersecting && !intervalId) {
-                    console.log(`Cycle element ${index}: Starting cycle (visible)`);
-                    intervalId = setInterval(cycleImages, duration);
-                } else if (!entry.isIntersecting && intervalId) {
-                    console.log(`Cycle element ${index}: Stopping cycle (not visible)`);
-                    clearInterval(intervalId);
-                    intervalId = null;
-                }
-            }, { threshold: 0 });
-
-            observer.observe(cycleElement);
-            console.log(`Cycle element ${index}: Observer attached`);
-        });
-        
-        console.log('Image cycle system initialization complete');
-    }
-    
-    /**
-     * Masked Text Reveal System
-     * Beautiful text reveal animations with GSAP SplitText and ScrollTrigger
-     */
-    function initMaskedTextReveal() {
-        // Check if GSAP and required plugins are available
-        if (typeof gsap === 'undefined' || typeof SplitText === 'undefined' || typeof ScrollTrigger === 'undefined') {
-            console.warn('GSAP, SplitText, or ScrollTrigger not loaded. Make sure to include the required scripts in your Webflow project.');
-            return;
-        }
-
-        try {
-            // Register the plugins
-            gsap.registerPlugin(SplitText, ScrollTrigger);
-            
-            // Configuration for different split types
-            const splitConfig = {
-                lines: { duration: 0.8, stagger: 0.08 },
-                words: { duration: 0.6, stagger: 0.06 },
-                chars: { duration: 0.4, stagger: 0.01 }
-            };
-
-            // Wait for fonts to be loaded for better text splitting
-            document.fonts.ready.then(function () {
-                console.log('Fonts loaded, initializing text reveal...');
-                
-                // Set initial state for all headings
-                document.querySelectorAll('[data-split="heading"]').forEach(heading => {
-                    gsap.set(heading, { visibility: 'visible' });
-                });
-                
-                document.querySelectorAll('[data-split="heading"]').forEach(heading => {
-                    // Find the split type, default is 'lines'
-                    const type = heading.dataset.splitReveal || 'lines';
-                    const typesToSplit =
-                        type === 'lines' ? ['lines'] :
-                        type === 'words' ? ['lines', 'words'] :
-                        ['lines', 'words', 'chars'];
-                    
-                    // Split the text
-                    SplitText.create(heading, {
-                        type: typesToSplit.join(', '), // split into required elements
-                        mask: 'lines', // wrap each line in an overflow:hidden div
-                        autoSplit: true,
-                        linesClass: 'line',
-                        wordsClass: 'word',
-                        charsClass: 'letter',
-                        onSplit: function(instance) {
-                            const targets = instance[type]; // Register animation targets
-                            const config = splitConfig[type]; // Find matching duration and stagger
-                            
-                            // Set initial state and animate
-                            return gsap.fromTo(targets, 
-                                {
-                                    yPercent: 110,
-                                    opacity: 0,
-                                    visibility: 'hidden'
-                                },
-                                {
-                                    yPercent: 0,
-                                    opacity: 1,
-                                    visibility: 'visible',
-                                    duration: config.duration,
-                                    stagger: config.stagger,
-                                    ease: 'expo.out',
-                                    scrollTrigger: {
-                                        trigger: heading,
-                                        start: 'clamp(top 80%)',
-                                        once: true
-                                    }
-                                }
-                            );
+                // Create intersection observer for autoplay
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startCycle(items, duration, twoItems);
+                        } else {
+                            stopCycle();
                         }
                     });
+                }, { threshold: 0.1 });
+                
+                observer.observe(cycleElement);
+                console.log(`Cycle element ${index}: Observer attached`);
+            });
+            
+            console.log('Image cycle system initialization complete');
+            
+        } catch (error) {
+            console.error('Error initializing image cycle system:', error);
+        }
+    }
+
+    let cycleInterval;
+
+    function startCycle(items, duration, twoItems) {
+        if (cycleInterval) return;
+        
+        cycleInterval = setInterval(() => {
+            const activeItem = document.querySelector('[data-image-cycle-item="active"]');
+            const previousItem = document.querySelector('[data-image-cycle-item="previous"]');
+            
+            if (activeItem) {
+                // Set current active to previous
+                activeItem.setAttribute('data-image-cycle-item', 'previous');
+                
+                // Find next item
+                let nextItem = activeItem.nextElementSibling;
+                if (!nextItem || !nextItem.hasAttribute('data-image-cycle-item')) {
+                    nextItem = items[0];
+                }
+                
+                // Set next item to active
+                nextItem.setAttribute('data-image-cycle-item', 'active');
+                
+                // Remove previous state from old previous item
+                if (previousItem) {
+                    previousItem.setAttribute('data-image-cycle-item', 'not-active');
+                }
+            }
+        }, duration);
+    }
+
+    function stopCycle() {
+        if (cycleInterval) {
+            clearInterval(cycleInterval);
+            cycleInterval = null;
+        }
+    }
+
+    // Smooth scrolling system
+    function setupSmoothScrolling() {
+        try {
+            // Wait for external scripts to load
+            setTimeout(() => {
+                if (typeof LocomotiveScroll !== 'undefined') {
+                    const lenisOptions = {
+                        duration: 1.2,
+                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                        direction: 'vertical',
+                        gestureDirection: 'vertical',
+                        smooth: true,
+                        mouseMultiplier: 1,
+                        smoothTouch: false,
+                        touchMultiplier: 2,
+                        infinite: false,
+                    };
+                    
+                    const locomotiveScroll = new LocomotiveScroll({
+                        el: document.querySelector('[data-scroll-container]'),
+                        ...lenisOptions
+                    });
+                    
+                    // Store instance globally
+                    window.DrivingClassic = window.DrivingClassic || {};
+                    window.DrivingClassic.locomotiveScroll = locomotiveScroll;
+                    
+                    console.log('Locomotive Scroll initialized successfully');
+                    console.log('Testing smooth scroll functionality...');
+                    
+                } else {
+                    console.warn('Locomotive Scroll not loaded');
+                }
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error setting up smooth scrolling:', error);
+        }
+    }
+
+    // Masked text reveal system
+    function initMaskedTextReveal() {
+        try {
+            // Wait for fonts to load
+            document.fonts.ready.then(() => {
+                console.log('Fonts loaded, initializing text reveal...');
+                
+                const headings = document.querySelectorAll('[data-split="heading"]');
+                
+                if (headings.length === 0) return;
+                
+                // Register GSAP plugins
+                gsap.registerPlugin(SplitText, ScrollTrigger);
+                
+                // Create custom ease
+                CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
+                
+                const splitConfig = {
+                    type: "chars,words,lines",
+                    linesClass: "overflow-hidden"
+                };
+                
+                headings.forEach(heading => {
+                    // Ensure element is visible for GSAP to split it
+                    gsap.set(heading, { visibility: 'visible' });
+                    
+                    const split = new SplitText(heading, splitConfig);
+                    const revealType = heading.getAttribute('data-split-reveal') || 'lines';
+                    
+                    let elementsToAnimate;
+                    switch (revealType) {
+                        case 'lines':
+                            elementsToAnimate = split.lines;
+                            break;
+                        case 'words':
+                            elementsToAnimate = split.words;
+                            break;
+                        case 'chars':
+                            elementsToAnimate = split.chars;
+                            break;
+                        default:
+                            elementsToAnimate = split.lines;
+                    }
+                    
+                    // Set initial state
+                    gsap.set(elementsToAnimate, { 
+                        y: "100%", 
+                        opacity: 0,
+                        visibility: 'visible'
+                    });
+                    
+                    // Create reveal animation
+                    gsap.fromTo(elementsToAnimate, 
+                        { 
+                            y: "100%", 
+                            opacity: 0,
+                            visibility: 'visible'
+                        },
+                        {
+                            y: "0%",
+                            opacity: 1,
+                            visibility: 'visible',
+                            duration: 1.2,
+                            ease: "osmo-ease",
+                            stagger: 0.1,
+                            scrollTrigger: {
+                                trigger: heading,
+                                start: "top 80%",
+                                end: "bottom 20%",
+                                toggleActions: "play none none reverse"
+                            }
+                        }
+                    );
                 });
                 
                 console.log('Masked text reveal system initialized successfully');
+                
             });
             
         } catch (error) {
             console.error('Error initializing masked text reveal:', error);
         }
     }
-    
-    /**
-     * Centered Looping Slider System
-     * Professional slider with drag support, autoplay, and smooth animations
-     */
+
+    // Centered looping slider system
     function initSliders() {
-        // Check if GSAP and required plugins are available
-        if (typeof gsap === 'undefined' || typeof CustomEase === 'undefined' || typeof ScrollTrigger === 'undefined' || typeof Draggable === 'undefined' || typeof InertiaPlugin === 'undefined') {
-            console.warn('GSAP or required plugins not loaded. Make sure to include all required scripts in your Webflow project.');
-            return;
-        }
+        const sliderWrappers = gsap.utils.toArray(document.querySelectorAll('[data-centered-slider="wrapper"]'));
 
-        try {
-            // Register the plugins
-            gsap.registerPlugin(CustomEase, ScrollTrigger, Draggable, InertiaPlugin);
+        sliderWrappers.forEach((sliderWrapper) => {
+            const slides = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="slide"]'));
+            const bullets = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]'));
+            const prevButton = sliderWrapper.querySelector('[data-centered-slider="prev-button"]');
+            const nextButton = sliderWrapper.querySelector('[data-centered-slider="next-button"]');
+
+            let activeElement;
+            let activeBullet;
+            let currentIndex = 0;
+            let autoplay;
+
+            // Autoplay is now enabled/disabled via a boolean attribute.
+            const autoplayEnabled = sliderWrapper.getAttribute('data-slider-autoplay') === 'true';
             
-            // Create custom ease
-            CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
-            
-            console.log('Initializing centered looping sliders...');
-            
-            const sliderWrappers = gsap.utils.toArray(document.querySelectorAll('[data-centered-slider="wrapper"]'));
-            console.log('Found slider wrappers:', sliderWrappers.length);
-            
-            sliderWrappers.forEach((sliderWrapper, wrapperIndex) => {
-                const slides = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="slide"]'));
-                const bullets = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]'));
-                const prevButton = sliderWrapper.querySelector('[data-centered-slider="prev-button"]');
-                const nextButton = sliderWrapper.querySelector('[data-centered-slider="next-button"]');
+            // If enabled, get the autoplay duration (in seconds) from the separate attribute.
+            const autoplayDuration = autoplayEnabled ? parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-duration')) || 0 : 0;
 
-                console.log(`Slider ${wrapperIndex}: ${slides.length} slides, ${bullets.length} bullets`);
-
-                let activeElement;
-                let activeBullet;
-                let currentIndex = 0;
-                let autoplay;
-
-                // Autoplay is now enabled/disabled via a boolean attribute.
-                const autoplayEnabled = sliderWrapper.getAttribute('data-slider-autoplay') === 'true';
-                
-                // If enabled, get the autoplay duration (in seconds) from the separate attribute.
-                const autoplayDuration = autoplayEnabled ? parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-duration')) || 0 : 0;
-
-                // Dynamically assign unique IDs to slides
-                slides.forEach((slide, i) => {
-                    slide.setAttribute("id", `slide-${wrapperIndex}-${i}`);
-                });
-                
-                // Set ARIA attributes on bullets if they exist
-                if (bullets && bullets.length > 0) {
-                    bullets.forEach((bullet, i) => {
-                        bullet.setAttribute("aria-controls", `slide-${wrapperIndex}-${i}`);
-                        bullet.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
-                    });
-                }
-
-                // Use original Osmo onChange callback (simpler and more reliable)
-                const loop = horizontalLoop(slides, {
-                    paused: true,
-                    draggable: true,
-                    center: true,
-                    onChange: (element, index) => {
-                        console.log('onChange called:', index, element);
-                        currentIndex = index;
-                        
-                        // Remove active class from all slides and add to current
-                        slides.forEach(slide => slide.classList.remove("active"));
-                        element.classList.add("active");
-                        activeElement = element;
-                        
-                        console.log('Active slide updated:', element, 'Classes:', element.classList.toString());
-
-                        if (bullets && bullets.length > 0) {
-                            if (activeBullet) activeBullet.classList.remove("active");
-                            if (bullets[index]) {
-                                bullets[index].classList.add("active");
-                                activeBullet = bullets[index];
-                            }
-                            bullets.forEach((bullet, i) => {
-                                bullet.setAttribute("aria-selected", i === index ? "true" : "false");
-                            });
-                        }
-                        
-                    }
-                });
-                
-                // Use original Osmo logic: center on index 1 for 3-slide display
-                // (Osmo uses index 2 for 5-slide display)
-                const centerIndex = 1; // Middle of 3 visible slides
-                loop.toIndex(centerIndex, { duration: 0.01 });
-                
-                // Set initial active state to center slide
-                if (slides[centerIndex]) {
-                    slides[centerIndex].classList.add("active");
-                    activeElement = slides[centerIndex];
-                    console.log('Initial active slide set to center (Osmo style):', slides[centerIndex], 'Index:', centerIndex);
-                    
-                    // Also set the corresponding bullet as active
-                    if (bullets && bullets.length > 0 && bullets[centerIndex]) {
-                        bullets.forEach(bullet => bullet.classList.remove("active"));
-                        bullets[centerIndex].classList.add("active");
-                        bullets[centerIndex].setAttribute("aria-selected", "true");
-                        console.log('Initial bullet set to match center slide:', centerIndex);
-                    }
-                }
-                
-                // Remove the complex timeline event callback - use original Osmo approach
-                // The onChange callback above handles all state updates
-
-                function startAutoplay() {
-                    if (autoplayDuration > 0 && !autoplay) {
-                        const repeat = () => {
-                            loop.next({ ease: "osmo-ease", duration: 0.725 });
-                            autoplay = gsap.delayedCall(autoplayDuration, repeat);
-                        };
-                        autoplay = gsap.delayedCall(autoplayDuration, repeat);
-                    }
-                }
-
-                function stopAutoplay() {
-                    if (autoplay) {
-                        autoplay.kill();
-                        autoplay = null;
-                    }
-                }
-
-                // Start/stop autoplay based on viewport visibility via ScrollTrigger
-                ScrollTrigger.create({
-                    trigger: sliderWrapper,
-                    start: "top bottom",
-                    end: "bottom top",
-                    onEnter: startAutoplay,
-                    onLeave: stopAutoplay,
-                    onEnterBack: startAutoplay,
-                    onLeaveBack: stopAutoplay
-                });
-
-                // Pause autoplay on mouse hover over the slider
-                sliderWrapper.addEventListener("mouseenter", stopAutoplay);
-                sliderWrapper.addEventListener("mouseleave", () => {
-                    if (ScrollTrigger.isInViewport(sliderWrapper)) startAutoplay();
-                });
-
-                // Slide click event for direct navigation
-                slides.forEach((slide, i) => {
-                    slide.addEventListener("click", () => {
-                        loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
-                    });
-                });
-
-                // Bullets click event for direct navigation (if available)
-                if (bullets && bullets.length > 0) {
-                    bullets.forEach((bullet, i) => {
-                        bullet.addEventListener("click", () => {
-                            loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
-                            if (activeBullet) activeBullet.classList.remove("active");
-                            bullet.classList.add("active");
-                            activeBullet = bullet;
-                            bullets.forEach((b, j) => {
-                                b.setAttribute("aria-selected", j === i ? "true" : "false");
-                            });
-                        });
-                    });
-                }
-
-                // Prev/Next button listeners (if the buttons exist)
-                if (prevButton) {
-                    prevButton.addEventListener("click", () => {
-                        let newIndex = currentIndex - 1;
-                        if (newIndex < 0) newIndex = slides.length - 1;
-                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                    });
-                }
-
-                if (nextButton) {
-                    nextButton.addEventListener("click", () => {
-                        let newIndex = currentIndex + 1;
-                        if (newIndex >= slides.length) newIndex = 0;
-                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                    });
-                }
-                
+            // Dynamically assign unique IDs to slides
+            slides.forEach((slide, i) => {
+                slide.setAttribute("id", `slide-${i}`);
             });
             
-            console.log('Centered looping sliders initialized successfully');
+            // Set ARIA attributes on bullets if they exist
+            if (bullets && bullets.length > 0) {
+                bullets.forEach((bullet, i) => {
+                    bullet.setAttribute("aria-controls", `slide-${i}`);
+                    bullet.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
+                });
+            }
+
+            const loop = horizontalLoop(slides, {
+                paused: true,
+                draggable: true,
+                center: true,
+                onChange: (element, index) => {
+                    currentIndex = index;
+                    
+                    if (activeElement) activeElement.classList.remove("active");
+                    element.classList.add("active");
+                    activeElement = element;
+
+                    if (bullets && bullets.length > 0) {
+                        if (activeBullet) activeBullet.classList.remove("active");
+                        if (bullets[index]) {
+                            bullets[index].classList.add("active");
+                            activeBullet = bullets[index];
+                        }
+                        bullets.forEach((bullet, i) => {
+                            bullet.setAttribute("aria-selected", i === index ? "true" : "false");
+                        });
+                    }
+                    
+                }
+            });
             
-        } catch (error) {
-            console.error('Error initializing centered looping sliders:', error);
-        }
+            // On initialization, center the slider (changed from 2 to 1 for 3-slide display)
+            loop.toIndex(1, { duration: 0.01 });
+
+            function startAutoplay() {
+                if (autoplayDuration > 0 && !autoplay) {
+                    const repeat = () => {
+                        loop.next({ ease: "osmo-ease", duration: 0.725 });
+                        autoplay = gsap.delayedCall(autoplayDuration, repeat);
+                    };
+                    autoplay = gsap.delayedCall(autoplayDuration, repeat);
+                }
+            }
+
+            function stopAutoplay() {
+                if (autoplay) {
+                    autoplay.kill();
+                    autoplay = null;
+                }
+            }
+
+            // Start/stop autoplay based on viewport visibility via ScrollTrigger
+            ScrollTrigger.create({
+                trigger: sliderWrapper,
+                start: "top bottom",
+                end: "bottom top",
+                onEnter: startAutoplay,
+                onLeave: stopAutoplay,
+                onEnterBack: startAutoplay,
+                onLeaveBack: stopAutoplay
+            });
+
+            // Pause autoplay on mouse hover over the slider
+            sliderWrapper.addEventListener("mouseenter", stopAutoplay);
+            sliderWrapper.addEventListener("mouseleave", () => {
+                if (ScrollTrigger.isInViewport(sliderWrapper)) startAutoplay();
+            });
+
+            // Slide click event for direct navigation
+            slides.forEach((slide, i) => {
+                slide.addEventListener("click", () => {
+                    loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
+                });
+            });
+
+            // Bullets click event for direct navigation (if available)
+            if (bullets && bullets.length > 0) {
+                bullets.forEach((bullet, i) => {
+                    bullet.addEventListener("click", () => {
+                        loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
+                        if (activeBullet) activeBullet.classList.remove("active");
+                        bullet.classList.add("active");
+                        activeBullet = bullet;
+                        bullets.forEach((b, j) => {
+                            b.setAttribute("aria-selected", j === i ? "true" : "false");
+                        });
+                    });
+                });
+            }
+
+            // Prev/Next button listeners (if the buttons exist)
+            if (prevButton) {
+                prevButton.addEventListener("click", () => {
+                    let newIndex = currentIndex - 1;
+                    if (newIndex < 0) newIndex = slides.length - 1;
+                    loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener("click", () => {
+                    let newIndex = currentIndex + 1;
+                    if (newIndex >= slides.length) newIndex = 0;
+                    loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
+                });
+            }
+            
+        });
     }
-    
-    /**
-     * GSAP Helper function to create a looping slider
-     * Read more: https://gsap.com/docs/v3/HelperFunctions/helpers/seamlessLoop
-     */
+
+    // GSAP Helper function to create a looping slider
+    // Read more: https://gsap.com/docs/v3/HelperFunctions/helpers/seamlessLoop
     function horizontalLoop(items, config) {
         let timeline;
         items = gsap.utils.toArray(items);
@@ -893,88 +637,67 @@
         });
         return timeline;
     }
-    
-    // Make functions available globally if needed
+
+    // Utility functions
+    function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    function debounce(func, wait, immediate) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                timeout = null;
+                if (!immediate) func(...args);
+            };
+            const callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func(...args);
+        };
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDrivingClassic);
+    } else {
+        initDrivingClassic();
+    }
+
+    // Expose functions globally for debugging
     window.DrivingClassic = {
-        init: initDrivingClassic,
-        utils: {
-            isElementInViewport: isElementInViewport,
-            debounce: debounce
-        },
         navigation: {
             init: initNavigation,
-            initMobile: initMobileMenu,
-            initDesktop: initDesktopDropdowns
+            initMobileMenu: initMobileMenu,
+            initDesktopDropdowns: initDesktopDropdowns
         },
         imageCycle: {
             init: initImageCycle,
             test: function() {
                 console.log('Testing image cycle system...');
                 const elements = document.querySelectorAll('[data-image-cycle]');
-                console.log('Elements with data-image-cycle:', elements);
+                console.log('Image cycle elements found:', elements.length);
                 elements.forEach((el, i) => {
                     const items = el.querySelectorAll('[data-image-cycle-item]');
-                    console.log(`Element ${i}:`, el, `Items:`, items);
+                    console.log(`Cycle ${i}:`, items.length, 'items');
                 });
             }
+        },
+        smoothScroll: {
+            init: setupSmoothScrolling
         },
         maskedTextReveal: {
-            init: initMaskedTextReveal,
-            test: function() {
-                console.log('Testing masked text reveal system...');
-                const elements = document.querySelectorAll('[data-split="heading"]');
-                console.log('Elements with data-split="heading":', elements.length);
-                elements.forEach((el, i) => {
-                    const revealType = el.dataset.splitReveal || 'lines';
-                    console.log(`Element ${i}:`, el, `Reveal type:`, revealType);
-                });
-            }
+            init: initMaskedTextReveal
         },
         sliders: {
-            init: initSliders,
-            test: function() {
-                console.log('Testing centered looping sliders...');
-                const elements = document.querySelectorAll('[data-centered-slider="wrapper"]');
-                console.log('Elements with data-centered-slider="wrapper":', elements.length);
-                elements.forEach((el, i) => {
-                    const slides = el.querySelectorAll('[data-centered-slider="slide"]');
-                    const bullets = el.querySelectorAll('[data-centered-slider="bullet"]');
-                    console.log(`Slider ${i}:`, el, `Slides:`, slides.length, `Bullets:`, bullets.length);
-                    
-                    // Check active states
-                    slides.forEach((slide, j) => {
-                        console.log(`Slide ${j}:`, slide, 'Active:', slide.classList.contains('active'), 'Classes:', slide.classList.toString());
-                    });
-                    
-                    if (bullets.length > 0) {
-                        bullets.forEach((bullet, j) => {
-                            console.log(`Bullet ${j}:`, bullet, 'Active:', bullet.classList.contains('active'), 'Classes:', bullet.classList.toString());
-                        });
-                    }
-                });
-            },
-            forceActive: function(sliderIndex, slideIndex) {
-                const sliders = document.querySelectorAll('[data-centered-slider="wrapper"]');
-                if (sliders[sliderIndex]) {
-                    const slides = sliders[sliderIndex].querySelectorAll('[data-centered-slider="slide"]');
-                    if (slides[slideIndex]) {
-                        slides.forEach(slide => slide.classList.remove("active"));
-                        slides[slideIndex].classList.add("active");
-                        console.log(`Forced slide ${slideIndex} to active in slider ${sliderIndex}`);
-                    }
-                }
-            }
-        },
-        locomotiveScroll: null, // Will be set when Locomotive Scroll initializes
-        test: function() {
-            console.log('=== Driving Classic System Test ===');
-            console.log('Locomotive Scroll available:', typeof LocomotiveScroll !== 'undefined');
-            console.log('Locomotive Scroll instance:', window.DrivingClassic.locomotiveScroll);
-            console.log('Image cycle elements:', document.querySelectorAll('[data-image-cycle]').length);
-            console.log('Navigation elements:', document.querySelectorAll('[data-dropdown-toggle]').length);
-            console.log('Text reveal elements:', document.querySelectorAll('[data-split="heading"]').length);
-            console.log('Slider elements:', document.querySelectorAll('[data-centered-slider="wrapper"]').length);
+            init: initSliders
         }
     };
-    
+
 })();
