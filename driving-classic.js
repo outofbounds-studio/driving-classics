@@ -610,6 +610,14 @@
                     slides[centerIndex].classList.add("active");
                     activeElement = slides[centerIndex];
                     console.log('Initial active slide set to visual center:', slides[centerIndex], 'Index:', centerIndex, '(middle of 3 visible slides)');
+                    
+                    // Also set the corresponding bullet as active
+                    if (bullets && bullets.length > 0 && bullets[centerIndex]) {
+                        bullets.forEach(bullet => bullet.classList.remove("active"));
+                        bullets[centerIndex].classList.add("active");
+                        bullets[centerIndex].setAttribute("aria-selected", "true");
+                        console.log('Initial bullet set to match center slide:', centerIndex);
+                    }
                 }
                 
                 // Add event listener to track timeline progress and update active slide
@@ -633,6 +641,7 @@
                         
                         // Update bullets if they exist
                         if (bullets && bullets.length > 0) {
+                            // Remove active class from all bullets first
                             bullets.forEach((bullet, i) => {
                                 bullet.classList.remove("active");
                                 bullet.setAttribute("aria-selected", "false");
@@ -642,6 +651,7 @@
                             if (bullets[currentSlideIndex]) {
                                 bullets[currentSlideIndex].classList.add("active");
                                 bullets[currentSlideIndex].setAttribute("aria-selected", "true");
+                                console.log('Bullet updated to match active slide:', currentSlideIndex);
                             }
                         }
                     }
