@@ -597,14 +597,15 @@
                     }
                 });
                 
-                // On initialization, center the slider
-                loop.toIndex(2, { duration: 0.01 });
+                // On initialization, center the slider to the middle slide
+                const centerIndex = Math.floor(slides.length / 2);
+                loop.toIndex(centerIndex, { duration: 0.01 });
                 
-                // Set initial active state
-                if (slides[2]) {
-                    slides[2].classList.add("active");
-                    activeElement = slides[2];
-                    console.log('Initial active slide set:', slides[2], 'Classes:', slides[2].classList.toString());
+                // Set initial active state to center slide
+                if (slides[centerIndex]) {
+                    slides[centerIndex].classList.add("active");
+                    activeElement = slides[centerIndex];
+                    console.log('Initial active slide set to center:', slides[centerIndex], 'Index:', centerIndex);
                 }
                 
                 // Add event listener to track timeline progress and update active slide
