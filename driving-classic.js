@@ -568,6 +568,7 @@
                     });
                 }
 
+                // Use original Osmo onChange callback (simpler and more reliable)
                 const loop = horizontalLoop(slides, {
                     paused: true,
                     draggable: true,
@@ -597,19 +598,16 @@
                     }
                 });
                 
-                // For 3-slide display, we want to center on the middle of visible slides
-                // Since we show 3 slides, the visual center should be slide 1 of the visible 3
-                const visibleSlides = 3;
-                const centerIndex = Math.floor(visibleSlides / 2); // This will be 1 (middle of 3)
-                
-                // On initialization, center the slider to the visual center
+                // Use original Osmo logic: center on index 1 for 3-slide display
+                // (Osmo uses index 2 for 5-slide display)
+                const centerIndex = 1; // Middle of 3 visible slides
                 loop.toIndex(centerIndex, { duration: 0.01 });
                 
-                // Set initial active state to visual center slide
+                // Set initial active state to center slide
                 if (slides[centerIndex]) {
                     slides[centerIndex].classList.add("active");
                     activeElement = slides[centerIndex];
-                    console.log('Initial active slide set to visual center:', slides[centerIndex], 'Index:', centerIndex, '(middle of 3 visible slides)');
+                    console.log('Initial active slide set to center (Osmo style):', slides[centerIndex], 'Index:', centerIndex);
                     
                     // Also set the corresponding bullet as active
                     if (bullets && bullets.length > 0 && bullets[centerIndex]) {
@@ -620,42 +618,8 @@
                     }
                 }
                 
-                // Add event listener to track timeline progress and update active slide
-                loop.eventCallback("onUpdate", function() {
-                    const currentSlideIndex = loop.closestIndex();
-                    if (currentSlideIndex !== currentIndex) {
-                        console.log('Timeline update detected:', currentSlideIndex, 'Previous:', currentIndex);
-                        currentIndex = currentSlideIndex;
-                        
-                        // IMPORTANT: Remove active class from ALL slides first
-                        slides.forEach(slide => {
-                            slide.classList.remove("active");
-                        });
-                        
-                        // Add active class to ONLY the current slide
-                        if (slides[currentSlideIndex]) {
-                            slides[currentSlideIndex].classList.add("active");
-                            activeElement = slides[currentSlideIndex];
-                            console.log('Active slide updated via timeline:', slides[currentSlideIndex], 'Index:', currentSlideIndex);
-                        }
-                        
-                        // Update bullets if they exist
-                        if (bullets && bullets.length > 0) {
-                            // Remove active class from all bullets first
-                            bullets.forEach((bullet, i) => {
-                                bullet.classList.remove("active");
-                                bullet.setAttribute("aria-selected", "false");
-                            });
-                            
-                            // Set only the current bullet as active
-                            if (bullets[currentSlideIndex]) {
-                                bullets[currentSlideIndex].classList.add("active");
-                                bullets[currentSlideIndex].setAttribute("aria-selected", "true");
-                                console.log('Bullet updated to match active slide:', currentSlideIndex);
-                            }
-                        }
-                    }
-                });
+                // Remove the complex timeline event callback - use original Osmo approach
+                // The onChange callback above handles all state updates
 
                 function startAutoplay() {
                     if (autoplayDuration > 0 && !autoplay) {
