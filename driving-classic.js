@@ -1,8 +1,6 @@
 /**
  * Driving Classic - Webflow Integration
- * 
- * This file contains all the JavaScript functionality for the Driving Classic website.
- * It's designed to be loaded via GitHub Pages and integrated with Webflow.
+ * time: 2025-09-02 14:36
  * 
  * External Dependencies (add to Webflow Head Code):
  * - Locomotive Scroll: https://cdn.jsdelivr.net/npm/lenis@1.2.3/dist/lenis.css
