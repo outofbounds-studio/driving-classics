@@ -386,6 +386,14 @@
                         const activeSlide = sliderWrapper.querySelector('.centered-slider-slide.active');
                         const activeIndex = Array.from(slides).indexOf(activeSlide);
                         console.log(`Slider ${index}: After centering, active index: ${activeIndex}`);
+                        
+                        // Debug: Check the actual transform positions of all slides
+                        console.log(`Slider ${index}: Slide transforms:`);
+                        slides.forEach((slide, i) => {
+                            const transform = slide.style.transform;
+                            const isActive = slide.classList.contains('active');
+                            console.log(`  Slide ${i}: transform="${transform}", active=${isActive}`);
+                        });
                     }, 50);
                 }, 100);
 
@@ -740,6 +748,26 @@
                         console.log(`Slider ${sliderIndex}: Forced active to index ${targetIndex}`);
                     }
                 }
+            },
+            compareSliders: function() {
+                console.log('=== COMPARING SLIDER POSITIONS ===');
+                const sliders = document.querySelectorAll('[data-centered-slider="wrapper"]');
+                
+                sliders.forEach((slider, sliderIndex) => {
+                    const slides = slider.querySelectorAll('[data-centered-slider="slide"]');
+                    const activeSlide = slider.querySelector('.centered-slider-slide.active');
+                    const activeIndex = Array.from(slides).indexOf(activeSlide);
+                    
+                    console.log(`Slider ${sliderIndex}: Active index = ${activeIndex}`);
+                    console.log(`Slider ${sliderIndex}: Slide positions:`);
+                    
+                    slides.forEach((slide, slideIndex) => {
+                        const transform = slide.style.transform;
+                        const isActive = slide.classList.contains('active');
+                        const rect = slide.getBoundingClientRect();
+                        console.log(`  Slide ${slideIndex}: transform="${transform}", active=${isActive}, left=${rect.left}, width=${rect.width}`);
+                    });
+                });
             }
         }
     };
