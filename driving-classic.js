@@ -309,210 +309,100 @@
         }
     }
 
-    // Centered looping slider system
+        // Centered looping slider system using Swiper.js (like MSC)
     function initSliders() {
         // Wait for Collection List content to be fully rendered
         setTimeout(() => {
-            const sliderWrappers = gsap.utils.toArray(document.querySelectorAll('[data-centered-slider="wrapper"]'));
+            const sliderWrappers = document.querySelectorAll('[data-centered-slider="wrapper"]');
+            console.log('Found slider wrappers:', sliderWrappers.length);
 
             sliderWrappers.forEach((sliderWrapper, index) => {
-                const slides = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="slide"]'));
-                const bullets = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]'));
+                const slides = sliderWrapper.querySelectorAll('[data-centered-slider="slide"]');
+                const bullets = sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]');
                 const prevButton = sliderWrapper.querySelector('[data-centered-slider="prev-button"]');
                 const nextButton = sliderWrapper.querySelector('[data-centered-slider="next-button"]');
 
-                let activeElement;
-                let activeBullet;
-                let currentIndex = 0;
-                let autoplay;
-
-                // Autoplay is now enabled/disabled via a boolean attribute.
-                const autoplayEnabled = sliderWrapper.getAttribute('data-slider-autoplay') === 'true';
-                
-                // If enabled, get the autoplay duration (in seconds) from the separate attribute.
-                const autoplayDuration = autoplayEnabled ? parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-duration')) || 0 : 0;
-
-                // Dynamically assign unique IDs to slides
-                slides.forEach((slide, i) => {
-                    slide.setAttribute("id", `slide-${index}-${i}`);
-                });
-                
-                // Set ARIA attributes on bullets if they exist
-                if (bullets && bullets.length > 0) {
-                    bullets.forEach((bullet, i) => {
-                        bullet.setAttribute("aria-controls", `slide-${index}-${i}`);
-                        bullet.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
-                    });
-                }
+                console.log(`Slider ${index}: Found ${slides.length} slides`);
 
                 // Calculate center index dynamically based on number of slides
                 const centerIndex = Math.floor(slides.length / 2);
                 console.log(`Slider ${index}: Total slides: ${slides.length}, Center index: ${centerIndex}`);
 
-                const loop = horizontalLoop(slides, {
-                    paused: true,
-                    draggable: true,
-                    center: true, // Enable automatic centering
-                    onChange: (element, index) => {
-                        currentIndex = index;
-                        
-                        if (activeElement) activeElement.classList.remove("active");
-                        element.classList.add("active");
-                        activeElement = element;
-
-                        if (bullets && bullets.length > 0) {
-                            if (activeBullet) activeBullet.classList.remove("active");
-                            if (bullets[index]) {
-                                bullets[index].classList.add("active");
-                                activeBullet = bullets[index];
-                            }
-                            bullets.forEach((bullet, i) => {
-                                bullet.setAttribute("aria-selected", i === index ? "true" : "false");
+                // Create Swiper instance (like MSC testimonial slider)
+                const swiper = new Swiper(sliderWrapper.querySelector('.swiper') || sliderWrapper, {
+                    speed: 450,
+                    loop: true,
+                    autoHeight: false,
+                    centeredSlides: true,
+                    followFinger: true,
+                    freeMode: false,
+                    slideToClickedSlide: false,
+                    slidesPerView: 1,
+                    spaceBetween: "4%",
+                    rewind: false,
+                    mousewheel: {
+                        forceToAxis: true
+                    },
+                    keyboard: {
+                        enabled: true,
+                        onlyInViewport: true
+                    },
+                    breakpoints: {
+                        480: {
+                            slidesPerView: 1,
+                            spaceBetween: "4%"
+                        },
+                        768: {
+                            slidesPerView: 2,
+                            spaceBetween: "4%"
+                        },
+                        992: {
+                            slidesPerView: 3.5,
+                            spaceBetween: "1%"
+                        }
+                    },
+                    pagination: {
+                        el: sliderWrapper.querySelector('.swiper-bullet-wrapper') || sliderWrapper.querySelector('[data-centered-slider="bullet"]'),
+                        bulletActiveClass: "is-active",
+                        bulletClass: "swiper-bullet",
+                        bulletElement: "button",
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: sliderWrapper.querySelector('.swiper-next') || nextButton,
+                        prevEl: sliderWrapper.querySelector('.swiper-prev') || prevButton,
+                        disabledClass: "is-disabled"
+                    },
+                    scrollbar: {
+                        el: sliderWrapper.querySelector('.swiper-drag-wrapper'),
+                        draggable: true,
+                        dragClass: "swiper-drag",
+                        snapOnRelease: true
+                    },
+                    slideActiveClass: "is-active",
+                    slideDuplicateActiveClass: "is-active",
+                    on: {
+                        slideChange: function () {
+                            // Remove active class from all slides
+                            this.slides.forEach(slide => {
+                                slide.classList.remove('is-active');
                             });
+                            // Add active class to current slide
+                            this.slides[this.activeIndex].classList.add('is-active');
+                        },
+                        init: function () {
+                            console.log(`Slider ${index}: Swiper initialized`);
+                            // Set initial active slide to center
+                            this.slideTo(centerIndex, 0, false);
                         }
                     }
                 });
-                
-                // On initialization, center the slider dynamically
-                setTimeout(() => {
-                    console.log(`Slider ${index}: Centering to index ${centerIndex} (center of ${slides.length} slides)`);
-                    console.log(`Slider ${index}: Current active index: ${currentIndex}`);
-                    
-                    // Center to the calculated center index
-                    loop.toIndex(centerIndex, { duration: 0.01 });
-                    
-                    // For dynamic slider, force correct positioning by copying static slider's approach
-                    if (index === 0) {
-                        setTimeout(() => {
-                            const firstSlideTransform = slides[0].style.transform;
-                            console.log(`Slider ${index}: Initial transform: ${firstSlideTransform}`);
-                            
-                            // If the transform is wrong (150% or -50%), force correct positioning
-                            if (firstSlideTransform.includes('150%') || firstSlideTransform.includes('-50%')) {
-                                console.log(`Slider ${index}: Forcing correct positioning...`);
-                                
-                                // Get the correct transform values from the static slider
-                                const staticSlider = document.querySelectorAll('[data-centered-slider="wrapper"]')[1];
-                                const staticSlides = staticSlider.querySelectorAll('[data-centered-slider="slide"]');
-                                
-                                console.log(`Slider ${index}: Static slider found: ${staticSlider ? 'yes' : 'no'}`);
-                                console.log(`Slider ${index}: Static slides found: ${staticSlides.length}`);
-                                
-                                if (staticSlides.length > 0) {
-                                    const correctTransform = staticSlides[0].style.transform;
-                                    console.log(`Slider ${index}: Using transform from static slider: ${correctTransform}`);
-                                    
-                                    // Apply the correct transform to all dynamic slides
-                                    slides.forEach((slide, i) => {
-                                        slide.style.transform = correctTransform;
-                                    });
-                                    
-                                    // Ensure the active slide has the active class
-                                    slides.forEach(slide => slide.classList.remove('active'));
-                                    if (slides[centerIndex]) {
-                                        slides[centerIndex].classList.add('active');
-                                    }
-                                    
-                                    console.log(`Slider ${index}: Positioning fix applied`);
-                                } else {
-                                    console.log(`Slider ${index}: No static slides found, cannot apply fix`);
-                                }
-                            }
-                        }, 200);
-                    }
-                    
-                    // Verify centering worked
-                    setTimeout(() => {
-                        const activeSlide = sliderWrapper.querySelector('.centered-slider-slide.active');
-                        const activeIndex = Array.from(slides).indexOf(activeSlide);
-                        console.log(`Slider ${index}: After centering, active index: ${activeIndex}`);
-                        
-                        // Debug: Check the actual transform positions of all slides
-                        console.log(`Slider ${index}: Slide transforms:`);
-                        slides.forEach((slide, i) => {
-                            const transform = slide.style.transform;
-                            const isActive = slide.classList.contains('active');
-                            console.log(`  Slide ${i}: transform="${transform}", active=${isActive}`);
-                        });
-                    }, 50);
-                }, 100);
 
-            function startAutoplay() {
-                if (autoplayDuration > 0 && !autoplay) {
-                    const repeat = () => {
-                        loop.next({ ease: "osmo-ease", duration: 0.725 });
-                        autoplay = gsap.delayedCall(autoplayDuration, repeat);
-                    };
-                    autoplay = gsap.delayedCall(autoplayDuration, repeat);
-                }
-            }
-
-            function stopAutoplay() {
-                if (autoplay) {
-                    autoplay.kill();
-                    autoplay = null;
-                }
-            }
-
-            // Start/stop autoplay based on viewport visibility via ScrollTrigger
-            ScrollTrigger.create({
-                trigger: sliderWrapper,
-                start: "top bottom",
-                end: "bottom top",
-                onEnter: startAutoplay,
-                onLeave: stopAutoplay,
-                onEnterBack: startAutoplay,
-                onLeaveBack: stopAutoplay
+                // Store swiper instance for potential future use
+                sliderWrapper.swiper = swiper;
             });
-
-            // Pause autoplay on mouse hover over the slider
-            sliderWrapper.addEventListener("mouseenter", stopAutoplay);
-            sliderWrapper.addEventListener("mouseleave", () => {
-                if (ScrollTrigger.isInViewport(sliderWrapper)) startAutoplay();
-            });
-
-            // Slide click event for direct navigation
-            slides.forEach((slide, i) => {
-                slide.addEventListener("click", () => {
-                    loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
-                });
-            });
-
-                                            // Bullets click event for direct navigation (if available)
-                if (bullets && bullets.length > 0) {
-                    bullets.forEach((bullet, i) => {
-                        bullet.addEventListener("click", () => {
-                            loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
-                            if (activeBullet) activeBullet.classList.remove("active");
-                            bullet.classList.add("active");
-                            activeBullet = bullet;
-                            bullets.forEach((b, j) => {
-                                b.setAttribute("aria-selected", j === i ? "true" : "false");
-                            });
-                        });
-                    });
-                }
-
-                // Prev/Next button listeners (if the buttons exist)
-                if (prevButton) {
-                    prevButton.addEventListener("click", () => {
-                        let newIndex = currentIndex - 1;
-                        if (newIndex < 0) newIndex = slides.length - 1;
-                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                    });
-                }
-
-                if (nextButton) {
-                    nextButton.addEventListener("click", () => {
-                        let newIndex = currentIndex + 1;
-                        if (newIndex >= slides.length) newIndex = 0;
-                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                    });
-                }
-            
-        });
-    }, 1000); // Wait 1000ms for Collection List to fully render
-}
+        }, 1000); // Wait 1000ms for Collection List to fully render
+    }
 
     // GSAP Helper function to create a looping slider
     // Read more: https://gsap.com/docs/v3/HelperFunctions/helpers/seamlessLoop
