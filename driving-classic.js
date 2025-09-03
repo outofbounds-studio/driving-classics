@@ -416,6 +416,30 @@
                                 prev: wrapper?.querySelector('.swiper-prev')
                             });
                             console.log(`Swiper ${index}: Total slides:`, this.slides.length);
+                            
+                            // Debug button detection
+                            const nextButton = wrapper?.querySelector('.swiper-next');
+                            const prevButton = wrapper?.querySelector('.swiper-prev');
+                            
+                            console.log(`Swiper ${index}: Button details:`, {
+                                nextButton: nextButton,
+                                prevButton: prevButton,
+                                nextButtonClasses: nextButton?.className,
+                                prevButtonClasses: prevButton?.className,
+                                wrapperClasses: wrapper?.className
+                            });
+                            
+                            // Test button click events
+                            if (nextButton) {
+                                nextButton.addEventListener('click', () => {
+                                    console.log(`Swiper ${index}: Next button clicked`);
+                                });
+                            }
+                            if (prevButton) {
+                                prevButton.addEventListener('click', () => {
+                                    console.log(`Swiper ${index}: Prev button clicked`);
+                                });
+                            }
                         }
                     }
                 });
