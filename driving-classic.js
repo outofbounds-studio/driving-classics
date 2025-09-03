@@ -398,6 +398,7 @@
                         setTimeout(() => {
                             const firstSlideTransform = slides[0].style.transform;
                             console.log(`Slider ${index}: First slide transform before fix: ${firstSlideTransform}`);
+                            console.log(`Slider ${index}: Checking if transform includes '150%': ${firstSlideTransform.includes('150%')}`);
                             
                             // If the transform is still wrong (150%), manually fix it
                             if (firstSlideTransform.includes('150%')) {
@@ -416,6 +417,8 @@
                                 }
                                 
                                 console.log(`Slider ${index}: Manual positioning fix applied`);
+                            } else {
+                                console.log(`Slider ${index}: Transform looks correct, no fix needed`);
                             }
                         }, 200);
                     }
