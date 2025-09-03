@@ -367,6 +367,18 @@
                             });
                         }
                         
+                        // For dynamic slider, ensure correct positioning persists
+                        if (index === 0) {
+                            setTimeout(() => {
+                                const firstSlideTransform = slides[0].style.transform;
+                                if (firstSlideTransform.includes('150%')) {
+                                    console.log(`Slider 0: Fixing positioning after interaction...`);
+                                    slides.forEach((slide, i) => {
+                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
+                                    });
+                                }
+                            }, 10);
+                        }
                     }
                 });
                 
@@ -465,37 +477,76 @@
                 });
             });
 
-            // Bullets click event for direct navigation (if available)
-            if (bullets && bullets.length > 0) {
-                bullets.forEach((bullet, i) => {
-                    bullet.addEventListener("click", () => {
-                        loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
-                        if (activeBullet) activeBullet.classList.remove("active");
-                        bullet.classList.add("active");
-                        activeBullet = bullet;
-                        bullets.forEach((b, j) => {
-                            b.setAttribute("aria-selected", j === i ? "true" : "false");
+                            // Bullets click event for direct navigation (if available)
+                if (bullets && bullets.length > 0) {
+                    bullets.forEach((bullet, i) => {
+                        bullet.addEventListener("click", () => {
+                            loop.toIndex(i, { ease: "osmo-ease", duration: 0.725 });
+                            if (activeBullet) activeBullet.classList.remove("active");
+                            bullet.classList.add("active");
+                            activeBullet = bullet;
+                            bullets.forEach((b, j) => {
+                                b.setAttribute("aria-selected", j === i ? "true" : "false");
+                            });
+                            
+                            // For dynamic slider, ensure correct positioning persists
+                            if (index === 0) {
+                                setTimeout(() => {
+                                    const firstSlideTransform = slides[0].style.transform;
+                                    if (firstSlideTransform.includes('150%')) {
+                                        console.log(`Slider 0: Fixing positioning after bullet click...`);
+                                        slides.forEach((slide, i) => {
+                                            slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
+                                        });
+                                    }
+                                }, 10);
+                            }
                         });
                     });
-                });
-            }
+                }
 
-            // Prev/Next button listeners (if the buttons exist)
-            if (prevButton) {
-                prevButton.addEventListener("click", () => {
-                    let newIndex = currentIndex - 1;
-                    if (newIndex < 0) newIndex = slides.length - 1;
-                    loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                });
-            }
+                            // Prev/Next button listeners (if the buttons exist)
+                if (prevButton) {
+                    prevButton.addEventListener("click", () => {
+                        let newIndex = currentIndex - 1;
+                        if (newIndex < 0) newIndex = slides.length - 1;
+                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
+                        
+                        // For dynamic slider, ensure correct positioning persists
+                        if (index === 0) {
+                            setTimeout(() => {
+                                const firstSlideTransform = slides[0].style.transform;
+                                if (firstSlideTransform.includes('150%')) {
+                                    console.log(`Slider 0: Fixing positioning after prev button...`);
+                                    slides.forEach((slide, i) => {
+                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
+                                    });
+                                }
+                            }, 10);
+                        }
+                    });
+                }
 
-            if (nextButton) {
-                nextButton.addEventListener("click", () => {
-                    let newIndex = currentIndex + 1;
-                    if (newIndex >= slides.length) newIndex = 0;
-                    loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                });
-            }
+                if (nextButton) {
+                    nextButton.addEventListener("click", () => {
+                        let newIndex = currentIndex + 1;
+                        if (newIndex >= slides.length) newIndex = 0;
+                        loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
+                        
+                        // For dynamic slider, ensure correct positioning persists
+                        if (index === 0) {
+                            setTimeout(() => {
+                                const firstSlideTransform = slides[0].style.transform;
+                                if (firstSlideTransform.includes('150%')) {
+                                    console.log(`Slider 0: Fixing positioning after next button...`);
+                                    slides.forEach((slide, i) => {
+                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
+                                    });
+                                }
+                            }, 10);
+                        }
+                    });
+                }
             
         });
     }, 1000); // Wait 1000ms for Collection List to fully render
