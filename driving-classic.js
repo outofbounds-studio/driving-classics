@@ -44,6 +44,7 @@
         try {
             initMobileMenu();
             initDesktopDropdowns();
+            initScrollBasedNavColors();
             console.log('Navigation system initialized');
         } catch (error) {
             console.error('Error initializing navigation:', error);
@@ -92,6 +93,61 @@
                     dropdown.style.display = 'none';
                 }
             });
+        });
+    }
+
+    // Scroll-based navigation color changes
+    function initScrollBasedNavColors() {
+        const heroSection = document.querySelector('.home-hero') || document.querySelector('[data-hero-section]');
+        const nav = document.querySelector('.nav');
+        const navButtons = document.querySelectorAll('.nav-button');
+        const navBg = document.querySelector('.nav-bg');
+        const pageBg = document.querySelector('.page-bg');
+        
+        if (!heroSection) {
+            console.log('Hero section not found, skipping scroll-based nav colors');
+            return;
+        }
+        
+        // Create ScrollTrigger for nav color changes
+        ScrollTrigger.create({
+            trigger: heroSection,
+            start: "bottom top",
+            end: "bottom top",
+            onEnter: () => {
+                // Apply the same styles as dropdown hover
+                if (nav) nav.style.color = 'var(--color-dark)';
+                navButtons.forEach(button => {
+                    button.style.borderColor = 'var(--color-dark)';
+                    button.style.color = 'var(--color-dark)';
+                    if (button.classList.contains('is--primary')) {
+                        button.style.backgroundColor = 'var(--color-dark)';
+                        button.style.borderColor = 'var(--color-dark)';
+                        button.style.color = '#FFF';
+                    }
+                });
+                if (navBg) navBg.style.height = 'var(--nav-bg-height)';
+                if (pageBg) pageBg.style.opacity = '1';
+                
+                console.log('Nav colors changed to dark theme');
+            },
+            onLeaveBack: () => {
+                // Revert to original styles
+                if (nav) nav.style.color = '';
+                navButtons.forEach(button => {
+                    button.style.borderColor = '';
+                    button.style.color = '';
+                    if (button.classList.contains('is--primary')) {
+                        button.style.backgroundColor = '';
+                        button.style.borderColor = '';
+                        button.style.color = '';
+                    }
+                });
+                if (navBg) navBg.style.height = '';
+                if (pageBg) pageBg.style.opacity = '';
+                
+                console.log('Nav colors reverted to light theme');
+            }
         });
     }
 
