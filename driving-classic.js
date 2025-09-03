@@ -373,7 +373,19 @@
                 // On initialization, center the slider (changed from 2 to 1 for 3-slide display)
                 // Add extra delay for dynamic content to ensure proper centering
                 setTimeout(() => {
+                    console.log(`Slider ${index}: Centering to index 1`);
+                    console.log(`Slider ${index}: Total slides: ${slides.length}`);
+                    console.log(`Slider ${index}: Current active index: ${currentIndex}`);
+                    
+                    // Force center to index 1 for 3-slide display
                     loop.toIndex(1, { duration: 0.01 });
+                    
+                    // Verify centering worked
+                    setTimeout(() => {
+                        const activeSlide = sliderWrapper.querySelector('.centered-slider-slide.active');
+                        const activeIndex = Array.from(slides).indexOf(activeSlide);
+                        console.log(`Slider ${index}: After centering, active index: ${activeIndex}`);
+                    }, 50);
                 }, 100);
 
             function startAutoplay() {
@@ -700,7 +712,34 @@
             init: initMaskedTextReveal
         },
         sliders: {
-            init: initSliders
+            init: initSliders,
+            test: function() {
+                console.log('Testing slider system...');
+                const sliders = document.querySelectorAll('[data-centered-slider="wrapper"]');
+                console.log('Sliders found:', sliders.length);
+                sliders.forEach((slider, i) => {
+                    const slides = slider.querySelectorAll('[data-centered-slider="slide"]');
+                    const activeSlide = slider.querySelector('.centered-slider-slide.active');
+                    const activeIndex = Array.from(slides).indexOf(activeSlide);
+                    console.log(`Slider ${i}: ${slides.length} slides, active index: ${activeIndex}`);
+                });
+            },
+            forceCenter: function(sliderIndex = 0, targetIndex = 1) {
+                const sliders = document.querySelectorAll('[data-centered-slider="wrapper"]');
+                if (sliders[sliderIndex]) {
+                    const slides = sliders[sliderIndex].querySelectorAll('[data-centered-slider="slide"]');
+                    console.log(`Force centering slider ${sliderIndex} to index ${targetIndex}`);
+                    
+                    // Remove active class from all slides
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    
+                    // Add active class to target slide
+                    if (slides[targetIndex]) {
+                        slides[targetIndex].classList.add('active');
+                        console.log(`Slider ${sliderIndex}: Forced active to index ${targetIndex}`);
+                    }
+                }
+            }
         }
     };
 
