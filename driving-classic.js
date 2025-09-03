@@ -381,6 +381,39 @@
                     // Center to the calculated center index
                     loop.toIndex(centerIndex, { duration: 0.01 });
                     
+                    // For dynamic slider, force correct positioning by copying static slider's approach
+                    if (index === 0) {
+                        setTimeout(() => {
+                            const firstSlideTransform = slides[0].style.transform;
+                            console.log(`Slider ${index}: Initial transform: ${firstSlideTransform}`);
+                            
+                            // If the transform is wrong (150%), force correct positioning
+                            if (firstSlideTransform.includes('150%')) {
+                                console.log(`Slider ${index}: Forcing correct positioning...`);
+                                
+                                // Get the correct transform values from the static slider
+                                const staticSlider = document.querySelectorAll('[data-centered-slider="wrapper"]')[1];
+                                const staticSlides = staticSlider.querySelectorAll('[data-centered-slider="slide"]');
+                                const correctTransform = staticSlides[0].style.transform;
+                                
+                                console.log(`Slider ${index}: Using transform from static slider: ${correctTransform}`);
+                                
+                                // Apply the correct transform to all dynamic slides
+                                slides.forEach((slide, i) => {
+                                    slide.style.transform = correctTransform;
+                                });
+                                
+                                // Ensure the active slide has the active class
+                                slides.forEach(slide => slide.classList.remove('active'));
+                                if (slides[centerIndex]) {
+                                    slides[centerIndex].classList.add('active');
+                                }
+                                
+                                console.log(`Slider ${index}: Positioning fix applied`);
+                            }
+                        }, 200);
+                    }
+                    
                     // Verify centering worked
                     setTimeout(() => {
                         const activeSlide = sliderWrapper.querySelector('.centered-slider-slide.active');
