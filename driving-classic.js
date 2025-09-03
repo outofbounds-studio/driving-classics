@@ -375,8 +375,8 @@
                             spaceBetween: "4%"
                         },
                         992: {
-                            slidesPerView: 3.5,
-                            spaceBetween: "1%"
+                            slidesPerView: 2.5,
+                            spaceBetween: "2%"
                         }
                     },
                     pagination: {
