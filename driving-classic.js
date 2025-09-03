@@ -450,7 +450,8 @@
             }
             
         });
-    }
+    }, 500); // Wait 500ms for Collection List to fully render
+}
 
     // GSAP Helper function to create a looping slider
     // Read more: https://gsap.com/docs/v3/HelperFunctions/helpers/seamlessLoop
