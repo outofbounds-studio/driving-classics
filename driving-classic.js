@@ -380,19 +380,19 @@
                         }
                     },
                     pagination: {
-                        el: wrapper?.querySelector('.swiper-bullet-wrapper'),
+                        el: document.querySelector('.swiper-bullet-wrapper'),
                         bulletActiveClass: "is-active",
                         bulletClass: "swiper-bullet",
                         bulletElement: "button",
                         clickable: true
                     },
                     navigation: {
-                        nextEl: wrapper?.querySelector('.swiper-next'),
-                        prevEl: wrapper?.querySelector('.swiper-prev'),
+                        nextEl: document.querySelector('.swiper-next'),
+                        prevEl: document.querySelector('.swiper-prev'),
                         disabledClass: "is-disabled"
                     },
                     scrollbar: {
-                        el: wrapper?.querySelector('.swiper-drag-wrapper'),
+                        el: document.querySelector('.swiper-drag-wrapper'),
                         draggable: true,
                         dragClass: "swiper-drag",
                         snapOnRelease: true
@@ -412,21 +412,20 @@
                         init: function () {
                             console.log(`Swiper ${index}: Swiper initialized successfully`);
                             console.log(`Swiper ${index}: Navigation buttons found:`, {
-                                next: wrapper?.querySelector('.swiper-next'),
-                                prev: wrapper?.querySelector('.swiper-prev')
+                                next: document.querySelector('.swiper-next'),
+                                prev: document.querySelector('.swiper-prev')
                             });
                             console.log(`Swiper ${index}: Total slides:`, this.slides.length);
                             
                             // Debug button detection
-                            const nextButton = wrapper?.querySelector('.swiper-next');
-                            const prevButton = wrapper?.querySelector('.swiper-prev');
+                            const nextButton = document.querySelector('.swiper-next');
+                            const prevButton = document.querySelector('.swiper-prev');
                             
                             console.log(`Swiper ${index}: Button details:`, {
                                 nextButton: nextButton,
                                 prevButton: prevButton,
                                 nextButtonClasses: nextButton?.className,
-                                prevButtonClasses: prevButton?.className,
-                                wrapperClasses: wrapper?.className
+                                prevButtonClasses: prevButton?.className
                             });
                             
                             // Test button click events
