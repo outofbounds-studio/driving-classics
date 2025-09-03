@@ -313,14 +313,42 @@
     function initSliders() {
         // Wait for Collection List content to be fully rendered
         setTimeout(() => {
+            console.log('=== SLIDER DEBUG ===');
+            
+            // Check for different possible wrapper selectors
             const sliderWrappers = document.querySelectorAll('.centered-slider-group');
-            console.log('Found slider wrappers:', sliderWrappers.length);
+            const swiperElements = document.querySelectorAll('.swiper');
+            const slideElements = document.querySelectorAll('.swiper-slide');
+            const nextButtons = document.querySelectorAll('.swiper-next');
+            const prevButtons = document.querySelectorAll('.swiper-prev');
+            
+            console.log('Found elements:', {
+                'centered-slider-group': sliderWrappers.length,
+                'swiper': swiperElements.length,
+                'swiper-slide': slideElements.length,
+                'swiper-next': nextButtons.length,
+                'swiper-prev': prevButtons.length
+            });
+
+            // Log all found elements for debugging
+            console.log('All centered-slider-group elements:', sliderWrappers);
+            console.log('All swiper elements:', swiperElements);
+            console.log('All navigation buttons:', { next: nextButtons, prev: prevButtons });
 
             sliderWrappers.forEach((sliderWrapper, index) => {
                 console.log(`Slider ${index}: Initializing Swiper`);
+                console.log(`Slider ${index}: Wrapper element:`, sliderWrapper);
+                
+                const swiperElement = sliderWrapper.querySelector('.swiper');
+                console.log(`Slider ${index}: Swiper element found:`, swiperElement);
+                
+                if (!swiperElement) {
+                    console.error(`Slider ${index}: No .swiper element found inside wrapper`);
+                    return;
+                }
 
                 // Create Swiper instance (exact MSC testimonial slider configuration)
-                const swiper = new Swiper(sliderWrapper.querySelector('.swiper'), {
+                const swiper = new Swiper(swiperElement, {
                     speed: 450,
                     loop: true,
                     autoHeight: false,
@@ -374,6 +402,7 @@
                     slideDuplicateActiveClass: "is-active",
                     on: {
                         slideChange: function () {
+                            console.log(`Slider ${index}: Slide changed to index ${this.activeIndex}`);
                             // Remove active class from all slides
                             this.slides.forEach(slide => {
                                 slide.classList.remove('is-active');
@@ -387,6 +416,7 @@
                                 next: sliderWrapper.querySelector('.swiper-next'),
                                 prev: sliderWrapper.querySelector('.swiper-prev')
                             });
+                            console.log(`Slider ${index}: Total slides:`, this.slides.length);
                         }
                     }
                 });
