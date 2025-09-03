@@ -377,6 +377,12 @@
                     console.log(`Slider ${index}: Total slides: ${slides.length}`);
                     console.log(`Slider ${index}: Current active index: ${currentIndex}`);
                     
+                    // Force a refresh of the loop calculations for dynamic content
+                    if (index === 0) { // Only for dynamic slider
+                        console.log(`Slider ${index}: Refreshing loop calculations...`);
+                        loop.refresh(true); // Deep refresh
+                    }
+                    
                     // For 5 visible slides, center on index 2 (middle: 0,1,2,3,4)
                     const targetIndex = 2;
                     loop.toIndex(targetIndex, { duration: 0.01 });
