@@ -335,17 +335,16 @@
             console.log('All swiper elements:', swiperElements);
             console.log('All navigation buttons:', { next: nextButtons, prev: prevButtons });
 
-            sliderWrappers.forEach((sliderWrapper, index) => {
-                console.log(`Slider ${index}: Initializing Swiper`);
-                console.log(`Slider ${index}: Wrapper element:`, sliderWrapper);
+            // Initialize Swiper directly on the swiper element
+            swiperElements.forEach((swiperElement, index) => {
+                console.log(`Swiper ${index}: Initializing`);
+                console.log(`Swiper ${index}: Element:`, swiperElement);
                 
-                const swiperElement = sliderWrapper.querySelector('.swiper');
-                console.log(`Slider ${index}: Swiper element found:`, swiperElement);
+                // Find the closest wrapper for navigation buttons
+                const wrapper = swiperElement.closest('.centered-slider-group') || 
+                              swiperElement.parentElement;
                 
-                if (!swiperElement) {
-                    console.error(`Slider ${index}: No .swiper element found inside wrapper`);
-                    return;
-                }
+                console.log(`Swiper ${index}: Using wrapper:`, wrapper);
 
                 // Create Swiper instance (exact MSC testimonial slider configuration)
                 const swiper = new Swiper(swiperElement, {
@@ -381,19 +380,19 @@
                         }
                     },
                     pagination: {
-                        el: sliderWrapper.querySelector('.swiper-bullet-wrapper'),
+                        el: wrapper?.querySelector('.swiper-bullet-wrapper'),
                         bulletActiveClass: "is-active",
                         bulletClass: "swiper-bullet",
                         bulletElement: "button",
                         clickable: true
                     },
                     navigation: {
-                        nextEl: sliderWrapper.querySelector('.swiper-next'),
-                        prevEl: sliderWrapper.querySelector('.swiper-prev'),
+                        nextEl: wrapper?.querySelector('.swiper-next'),
+                        prevEl: wrapper?.querySelector('.swiper-prev'),
                         disabledClass: "is-disabled"
                     },
                     scrollbar: {
-                        el: sliderWrapper.querySelector('.swiper-drag-wrapper'),
+                        el: wrapper?.querySelector('.swiper-drag-wrapper'),
                         draggable: true,
                         dragClass: "swiper-drag",
                         snapOnRelease: true
@@ -402,7 +401,7 @@
                     slideDuplicateActiveClass: "is-active",
                     on: {
                         slideChange: function () {
-                            console.log(`Slider ${index}: Slide changed to index ${this.activeIndex}`);
+                            console.log(`Swiper ${index}: Slide changed to index ${this.activeIndex}`);
                             // Remove active class from all slides
                             this.slides.forEach(slide => {
                                 slide.classList.remove('is-active');
@@ -411,18 +410,18 @@
                             this.slides[this.activeIndex].classList.add('is-active');
                         },
                         init: function () {
-                            console.log(`Slider ${index}: Swiper initialized successfully`);
-                            console.log(`Slider ${index}: Navigation buttons found:`, {
-                                next: sliderWrapper.querySelector('.swiper-next'),
-                                prev: sliderWrapper.querySelector('.swiper-prev')
+                            console.log(`Swiper ${index}: Swiper initialized successfully`);
+                            console.log(`Swiper ${index}: Navigation buttons found:`, {
+                                next: wrapper?.querySelector('.swiper-next'),
+                                prev: wrapper?.querySelector('.swiper-prev')
                             });
-                            console.log(`Slider ${index}: Total slides:`, this.slides.length);
+                            console.log(`Swiper ${index}: Total slides:`, this.slides.length);
                         }
                     }
                 });
 
                 // Store swiper instance for potential future use
-                sliderWrapper.swiper = swiper;
+                swiperElement.swiper = swiper;
             });
         }, 1000); // Wait 1000ms for Collection List to fully render
     }
