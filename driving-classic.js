@@ -381,6 +381,33 @@
                     const targetIndex = 2;
                     loop.toIndex(targetIndex, { duration: 0.01 });
                     
+                    // For dynamic slider, manually fix positioning if needed
+                    if (index === 0) {
+                        setTimeout(() => {
+                            const firstSlideTransform = slides[0].style.transform;
+                            console.log(`Slider ${index}: First slide transform before fix: ${firstSlideTransform}`);
+                            
+                            // If the transform is still wrong (150%), manually fix it
+                            if (firstSlideTransform.includes('150%')) {
+                                console.log(`Slider ${index}: Manually fixing positioning...`);
+                                
+                                // Force all slides to the correct position
+                                slides.forEach((slide, i) => {
+                                    // Use the same transform as the working static slider
+                                    slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
+                                });
+                                
+                                // Ensure the active slide has the active class
+                                slides.forEach(slide => slide.classList.remove('active'));
+                                if (slides[targetIndex]) {
+                                    slides[targetIndex].classList.add('active');
+                                }
+                                
+                                console.log(`Slider ${index}: Manual positioning fix applied`);
+                            }
+                        }, 200);
+                    }
+                    
                     // Verify centering worked
                     setTimeout(() => {
                         const activeSlide = sliderWrapper.querySelector('.centered-slider-slide.active');
