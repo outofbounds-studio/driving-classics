@@ -507,6 +507,16 @@
 
                 // Store swiper instance for potential future use
                 swiperElement.swiper = swiper;
+                
+                // Ensure Link Block clicks work with Swiper
+                const linkBlocks = swiperElement.querySelectorAll('a[href]');
+                linkBlocks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        // Allow the link to work normally
+                        e.stopPropagation();
+                        console.log('Link Block clicked:', link.href);
+                    });
+                });
             });
         }, 1000); // Wait 1000ms for Collection List to fully render
     }
