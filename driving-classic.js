@@ -115,7 +115,7 @@
             start: "bottom top",
             end: "bottom top",
             onEnter: () => {
-                // Apply the same styles as dropdown hover
+                // Apply the same styles as dropdown hover (without nav-bg)
                 if (nav) nav.style.color = 'var(--color-dark)';
                 navButtons.forEach(button => {
                     button.style.borderColor = 'var(--color-dark)';
@@ -126,13 +126,11 @@
                         button.style.color = '#FFF';
                     }
                 });
-                if (navBg) navBg.style.height = 'var(--nav-bg-height)';
-                if (pageBg) pageBg.style.opacity = '1';
                 
                 console.log('Nav colors changed to dark theme');
             },
             onLeaveBack: () => {
-                // Revert to original styles
+                // Revert to original styles (without nav-bg)
                 if (nav) nav.style.color = '';
                 navButtons.forEach(button => {
                     button.style.borderColor = '';
@@ -143,8 +141,6 @@
                         button.style.color = '';
                     }
                 });
-                if (navBg) navBg.style.height = '';
-                if (pageBg) pageBg.style.opacity = '';
                 
                 console.log('Nav colors reverted to light theme');
             }
