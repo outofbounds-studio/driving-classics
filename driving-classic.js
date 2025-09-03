@@ -394,22 +394,29 @@
                                 // Get the correct transform values from the static slider
                                 const staticSlider = document.querySelectorAll('[data-centered-slider="wrapper"]')[1];
                                 const staticSlides = staticSlider.querySelectorAll('[data-centered-slider="slide"]');
-                                const correctTransform = staticSlides[0].style.transform;
                                 
-                                console.log(`Slider ${index}: Using transform from static slider: ${correctTransform}`);
+                                console.log(`Slider ${index}: Static slider found: ${staticSlider ? 'yes' : 'no'}`);
+                                console.log(`Slider ${index}: Static slides found: ${staticSlides.length}`);
                                 
-                                // Apply the correct transform to all dynamic slides
-                                slides.forEach((slide, i) => {
-                                    slide.style.transform = correctTransform;
-                                });
-                                
-                                // Ensure the active slide has the active class
-                                slides.forEach(slide => slide.classList.remove('active'));
-                                if (slides[centerIndex]) {
-                                    slides[centerIndex].classList.add('active');
+                                if (staticSlides.length > 0) {
+                                    const correctTransform = staticSlides[0].style.transform;
+                                    console.log(`Slider ${index}: Using transform from static slider: ${correctTransform}`);
+                                    
+                                    // Apply the correct transform to all dynamic slides
+                                    slides.forEach((slide, i) => {
+                                        slide.style.transform = correctTransform;
+                                    });
+                                    
+                                    // Ensure the active slide has the active class
+                                    slides.forEach(slide => slide.classList.remove('active'));
+                                    if (slides[centerIndex]) {
+                                        slides[centerIndex].classList.add('active');
+                                    }
+                                    
+                                    console.log(`Slider ${index}: Positioning fix applied`);
+                                } else {
+                                    console.log(`Slider ${index}: No static slides found, cannot apply fix`);
                                 }
-                                
-                                console.log(`Slider ${index}: Positioning fix applied`);
                             }
                         }, 200);
                     }
