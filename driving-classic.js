@@ -348,7 +348,7 @@
                 const loop = horizontalLoop(slides, {
                     paused: true,
                     draggable: true,
-                    center: false, // Disable automatic centering
+                    center: true, // Re-enable automatic centering for 5 visible slides
                     onChange: (element, index) => {
                         currentIndex = index;
                         
@@ -370,23 +370,16 @@
                     }
                 });
                 
-                // On initialization, center the slider for 3 visible slides
+                // On initialization, center the slider for 5 visible slides (like Osmo)
                 // Add extra delay for dynamic content to ensure proper centering
                 setTimeout(() => {
-                    console.log(`Slider ${index}: Centering to index 1`);
+                    console.log(`Slider ${index}: Centering to index 2 (middle of 5 slides)`);
                     console.log(`Slider ${index}: Total slides: ${slides.length}`);
                     console.log(`Slider ${index}: Current active index: ${currentIndex}`);
                     
-                    // For 3 visible slides, we want the middle slide (index 1) to be centered
-                    // Calculate the position to show slides 0, 1, 2 with 1 in the center
-                    const targetIndex = 1;
+                    // For 5 visible slides, center on index 2 (middle: 0,1,2,3,4)
+                    const targetIndex = 2;
                     loop.toIndex(targetIndex, { duration: 0.01 });
-                    
-                    // Manually set the active class to ensure proper styling
-                    slides.forEach(slide => slide.classList.remove('active'));
-                    if (slides[targetIndex]) {
-                        slides[targetIndex].classList.add('active');
-                    }
                     
                     // Verify centering worked
                     setTimeout(() => {
