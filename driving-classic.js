@@ -514,8 +514,25 @@
                     link.addEventListener('click', (e) => {
                         // Allow the link to work normally
                         e.stopPropagation();
+                        e.preventDefault();
                         console.log('Link Block clicked:', link.href);
+                        
+                        // Navigate to the link
+                        window.location.href = link.href;
                     });
+                });
+                
+                // Disable Swiper's touch/click handling on links
+                swiperElement.addEventListener('touchstart', (e) => {
+                    if (e.target.closest('a[href]')) {
+                        e.stopPropagation();
+                    }
+                });
+                
+                swiperElement.addEventListener('click', (e) => {
+                    if (e.target.closest('a[href]')) {
+                        e.stopPropagation();
+                    }
                 });
             });
         }, 1000); // Wait 1000ms for Collection List to fully render
