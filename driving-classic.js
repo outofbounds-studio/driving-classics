@@ -247,7 +247,7 @@
                     linesClass: "overflow-hidden"
                 };
                 
-                headings.forEach(heading => {
+                headings.forEach((heading, index) => {
                     // Ensure element is visible for GSAP to split it
                     gsap.set(heading, { visibility: 'visible' });
                     
@@ -276,7 +276,7 @@
                         visibility: 'visible'
                     });
                     
-                    // Create reveal animation
+                    // Create reveal animation with unique ScrollTrigger
                     gsap.fromTo(elementsToAnimate, 
                         { 
                             y: "100%", 
@@ -292,12 +292,16 @@
                             stagger: 0.1,
                             scrollTrigger: {
                                 trigger: heading,
-                                start: "top 80%",
-                                end: "bottom 20%",
-                                toggleActions: "play none none none"
+                                start: "top 85%",
+                                end: "bottom 15%",
+                                toggleActions: "play none none none",
+                                markers: false,
+                                id: `heading-${index}`
                             }
                         }
                     );
+                    
+                    console.log(`Heading ${index}: Text reveal animation created for "${heading.textContent.substring(0, 30)}..."`);
                 });
                 
                 console.log('Masked text reveal system initialized successfully');
