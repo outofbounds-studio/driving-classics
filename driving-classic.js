@@ -328,8 +328,45 @@
                 const centerIndex = Math.floor(slides.length / 2);
                 console.log(`Slider ${index}: Total slides: ${slides.length}, Center index: ${centerIndex}`);
 
-                // Create Swiper instance (like MSC testimonial slider)
-                const swiper = new Swiper(sliderWrapper.querySelector('.swiper') || sliderWrapper, {
+                // Create Swiper container structure
+                const swiperContainer = document.createElement('div');
+                swiperContainer.className = 'swiper';
+                swiperContainer.style.width = '100%';
+                swiperContainer.style.height = 'auto';
+
+                const swiperWrapper = document.createElement('div');
+                swiperWrapper.className = 'swiper-wrapper';
+                swiperWrapper.style.display = 'flex';
+                swiperWrapper.style.transition = 'transform 0.3s ease';
+
+                // Move slides into Swiper structure
+                slides.forEach((slide, i) => {
+                    const swiperSlide = document.createElement('div');
+                    swiperSlide.className = 'swiper-slide';
+                    swiperSlide.style.width = 'auto';
+                    swiperSlide.style.flexShrink = '0';
+                    
+                    // Move the original slide content into the Swiper slide
+                    while (slide.firstChild) {
+                        swiperSlide.appendChild(slide.firstChild);
+                    }
+                    
+                    // Copy classes and attributes
+                    swiperSlide.className += ' ' + slide.className;
+                    Array.from(slide.attributes).forEach(attr => {
+                        if (attr.name !== 'data-centered-slider') {
+                            swiperSlide.setAttribute(attr.name, attr.value);
+                        }
+                    });
+                    
+                    swiperWrapper.appendChild(swiperSlide);
+                });
+
+                swiperContainer.appendChild(swiperWrapper);
+                sliderWrapper.appendChild(swiperContainer);
+
+                // Create Swiper instance
+                const swiper = new Swiper(swiperContainer, {
                     speed: 450,
                     loop: true,
                     autoHeight: false,
@@ -385,10 +422,14 @@
                         slideChange: function () {
                             // Remove active class from all slides
                             this.slides.forEach(slide => {
-                                slide.classList.remove('is-active');
+                                if (slide && slide.classList) {
+                                    slide.classList.remove('is-active');
+                                }
                             });
                             // Add active class to current slide
-                            this.slides[this.activeIndex].classList.add('is-active');
+                            if (this.slides[this.activeIndex] && this.slides[this.activeIndex].classList) {
+                                this.slides[this.activeIndex].classList.add('is-active');
+                            }
                         },
                         init: function () {
                             console.log(`Slider ${index}: Swiper initialized`);
