@@ -345,10 +345,14 @@
                     });
                 }
 
+                // Calculate center index dynamically based on number of slides
+                const centerIndex = Math.floor(slides.length / 2);
+                console.log(`Slider ${index}: Total slides: ${slides.length}, Center index: ${centerIndex}`);
+
                 const loop = horizontalLoop(slides, {
                     paused: true,
                     draggable: true,
-                    center: true, // Re-enable automatic centering for 5 visible slides
+                    center: true, // Enable automatic centering
                     onChange: (element, index) => {
                         currentIndex = index;
                         
@@ -366,62 +370,16 @@
                                 bullet.setAttribute("aria-selected", i === index ? "true" : "false");
                             });
                         }
-                        
-                        // For dynamic slider, ensure correct positioning persists
-                        if (index === 0) {
-                            setTimeout(() => {
-                                const firstSlideTransform = slides[0].style.transform;
-                                if (firstSlideTransform.includes('150%')) {
-                                    console.log(`Slider 0: Fixing positioning after interaction...`);
-                                    slides.forEach((slide, i) => {
-                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
-                                    });
-                                }
-                            }, 10);
-                        }
                     }
                 });
                 
-                // On initialization, center the slider for 5 visible slides (like Osmo)
-                // Add extra delay for dynamic content to ensure proper centering
+                // On initialization, center the slider dynamically
                 setTimeout(() => {
-                    console.log(`Slider ${index}: Centering to index 2 (middle of 5 slides)`);
-                    console.log(`Slider ${index}: Total slides: ${slides.length}`);
+                    console.log(`Slider ${index}: Centering to index ${centerIndex} (center of ${slides.length} slides)`);
                     console.log(`Slider ${index}: Current active index: ${currentIndex}`);
                     
-                    // For 5 visible slides, center on index 2 (middle: 0,1,2,3,4)
-                    const targetIndex = 2;
-                    loop.toIndex(targetIndex, { duration: 0.01 });
-                    
-                    // For dynamic slider, manually fix positioning if needed
-                    if (index === 0) {
-                        setTimeout(() => {
-                            const firstSlideTransform = slides[0].style.transform;
-                            console.log(`Slider ${index}: First slide transform before fix: ${firstSlideTransform}`);
-                            console.log(`Slider ${index}: Checking if transform includes '150%': ${firstSlideTransform.includes('150%')}`);
-                            
-                            // If the transform is still wrong (150%), manually fix it
-                            if (firstSlideTransform.includes('150%')) {
-                                console.log(`Slider ${index}: Manually fixing positioning...`);
-                                
-                                // Force all slides to the correct position
-                                slides.forEach((slide, i) => {
-                                    // Use the same transform as the working static slider
-                                    slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
-                                });
-                                
-                                // Ensure the active slide has the active class
-                                slides.forEach(slide => slide.classList.remove('active'));
-                                if (slides[targetIndex]) {
-                                    slides[targetIndex].classList.add('active');
-                                }
-                                
-                                console.log(`Slider ${index}: Manual positioning fix applied`);
-                            } else {
-                                console.log(`Slider ${index}: Transform looks correct, no fix needed`);
-                            }
-                        }, 200);
-                    }
+                    // Center to the calculated center index
+                    loop.toIndex(centerIndex, { duration: 0.01 });
                     
                     // Verify centering worked
                     setTimeout(() => {
@@ -480,7 +438,7 @@
                 });
             });
 
-                            // Bullets click event for direct navigation (if available)
+                                            // Bullets click event for direct navigation (if available)
                 if (bullets && bullets.length > 0) {
                     bullets.forEach((bullet, i) => {
                         bullet.addEventListener("click", () => {
@@ -491,42 +449,16 @@
                             bullets.forEach((b, j) => {
                                 b.setAttribute("aria-selected", j === i ? "true" : "false");
                             });
-                            
-                            // For dynamic slider, ensure correct positioning persists
-                            if (index === 0) {
-                                setTimeout(() => {
-                                    const firstSlideTransform = slides[0].style.transform;
-                                    if (firstSlideTransform.includes('150%')) {
-                                        console.log(`Slider 0: Fixing positioning after bullet click...`);
-                                        slides.forEach((slide, i) => {
-                                            slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
-                                        });
-                                    }
-                                }, 10);
-                            }
                         });
                     });
                 }
 
-                            // Prev/Next button listeners (if the buttons exist)
+                // Prev/Next button listeners (if the buttons exist)
                 if (prevButton) {
                     prevButton.addEventListener("click", () => {
                         let newIndex = currentIndex - 1;
                         if (newIndex < 0) newIndex = slides.length - 1;
                         loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                        
-                        // For dynamic slider, ensure correct positioning persists
-                        if (index === 0) {
-                            setTimeout(() => {
-                                const firstSlideTransform = slides[0].style.transform;
-                                if (firstSlideTransform.includes('150%')) {
-                                    console.log(`Slider 0: Fixing positioning after prev button...`);
-                                    slides.forEach((slide, i) => {
-                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
-                                    });
-                                }
-                            }, 10);
-                        }
                     });
                 }
 
@@ -535,19 +467,6 @@
                         let newIndex = currentIndex + 1;
                         if (newIndex >= slides.length) newIndex = 0;
                         loop.toIndex(newIndex, { ease: "osmo-ease", duration: 0.725 });
-                        
-                        // For dynamic slider, ensure correct positioning persists
-                        if (index === 0) {
-                            setTimeout(() => {
-                                const firstSlideTransform = slides[0].style.transform;
-                                if (firstSlideTransform.includes('150%')) {
-                                    console.log(`Slider 0: Fixing positioning after next button...`);
-                                    slides.forEach((slide, i) => {
-                                        slide.style.transform = 'translate(5.3191%, 0%) translate3d(0px, 0px, 0px)';
-                                    });
-                                }
-                            }, 10);
-                        }
                     });
                 }
             
