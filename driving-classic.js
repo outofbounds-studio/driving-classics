@@ -358,6 +358,11 @@
                     slidesPerView: 1,
                     spaceBetween: "4%",
                     rewind: false,
+                    autoplay: {
+                        delay: 4000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    },
                     mousewheel: {
                         forceToAxis: true
                     },
