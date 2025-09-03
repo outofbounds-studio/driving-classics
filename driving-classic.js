@@ -387,8 +387,8 @@
                             const firstSlideTransform = slides[0].style.transform;
                             console.log(`Slider ${index}: Initial transform: ${firstSlideTransform}`);
                             
-                            // If the transform is wrong (150%), force correct positioning
-                            if (firstSlideTransform.includes('150%')) {
+                            // If the transform is wrong (150% or -50%), force correct positioning
+                            if (firstSlideTransform.includes('150%') || firstSlideTransform.includes('-50%')) {
                                 console.log(`Slider ${index}: Forcing correct positioning...`);
                                 
                                 // Get the correct transform values from the static slider
