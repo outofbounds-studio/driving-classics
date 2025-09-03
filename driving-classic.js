@@ -311,65 +311,70 @@
 
     // Centered looping slider system
     function initSliders() {
-        const sliderWrappers = gsap.utils.toArray(document.querySelectorAll('[data-centered-slider="wrapper"]'));
+        // Wait for Collection List content to be fully rendered
+        setTimeout(() => {
+            const sliderWrappers = gsap.utils.toArray(document.querySelectorAll('[data-centered-slider="wrapper"]'));
 
-        sliderWrappers.forEach((sliderWrapper) => {
-            const slides = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="slide"]'));
-            const bullets = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]'));
-            const prevButton = sliderWrapper.querySelector('[data-centered-slider="prev-button"]');
-            const nextButton = sliderWrapper.querySelector('[data-centered-slider="next-button"]');
+            sliderWrappers.forEach((sliderWrapper, index) => {
+                const slides = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="slide"]'));
+                const bullets = gsap.utils.toArray(sliderWrapper.querySelectorAll('[data-centered-slider="bullet"]'));
+                const prevButton = sliderWrapper.querySelector('[data-centered-slider="prev-button"]');
+                const nextButton = sliderWrapper.querySelector('[data-centered-slider="next-button"]');
 
-            let activeElement;
-            let activeBullet;
-            let currentIndex = 0;
-            let autoplay;
+                let activeElement;
+                let activeBullet;
+                let currentIndex = 0;
+                let autoplay;
 
-            // Autoplay is now enabled/disabled via a boolean attribute.
-            const autoplayEnabled = sliderWrapper.getAttribute('data-slider-autoplay') === 'true';
-            
-            // If enabled, get the autoplay duration (in seconds) from the separate attribute.
-            const autoplayDuration = autoplayEnabled ? parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-duration')) || 0 : 0;
+                // Autoplay is now enabled/disabled via a boolean attribute.
+                const autoplayEnabled = sliderWrapper.getAttribute('data-slider-autoplay') === 'true';
+                
+                // If enabled, get the autoplay duration (in seconds) from the separate attribute.
+                const autoplayDuration = autoplayEnabled ? parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-duration')) || 0 : 0;
 
-            // Dynamically assign unique IDs to slides
-            slides.forEach((slide, i) => {
-                slide.setAttribute("id", `slide-${i}`);
-            });
-            
-            // Set ARIA attributes on bullets if they exist
-            if (bullets && bullets.length > 0) {
-                bullets.forEach((bullet, i) => {
-                    bullet.setAttribute("aria-controls", `slide-${i}`);
-                    bullet.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
+                // Dynamically assign unique IDs to slides
+                slides.forEach((slide, i) => {
+                    slide.setAttribute("id", `slide-${index}-${i}`);
                 });
-            }
-
-            const loop = horizontalLoop(slides, {
-                paused: true,
-                draggable: true,
-                center: true,
-                onChange: (element, index) => {
-                    currentIndex = index;
-                    
-                    if (activeElement) activeElement.classList.remove("active");
-                    element.classList.add("active");
-                    activeElement = element;
-
-                    if (bullets && bullets.length > 0) {
-                        if (activeBullet) activeBullet.classList.remove("active");
-                        if (bullets[index]) {
-                            bullets[index].classList.add("active");
-                            activeBullet = bullets[index];
-                        }
-                        bullets.forEach((bullet, i) => {
-                            bullet.setAttribute("aria-selected", i === index ? "true" : "false");
-                        });
-                    }
-                    
+                
+                // Set ARIA attributes on bullets if they exist
+                if (bullets && bullets.length > 0) {
+                    bullets.forEach((bullet, i) => {
+                        bullet.setAttribute("aria-controls", `slide-${index}-${i}`);
+                        bullet.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
+                    });
                 }
-            });
-            
-            // On initialization, center the slider (changed from 2 to 1 for 3-slide display)
-            loop.toIndex(1, { duration: 0.01 });
+
+                const loop = horizontalLoop(slides, {
+                    paused: true,
+                    draggable: true,
+                    center: true,
+                    onChange: (element, index) => {
+                        currentIndex = index;
+                        
+                        if (activeElement) activeElement.classList.remove("active");
+                        element.classList.add("active");
+                        activeElement = element;
+
+                        if (bullets && bullets.length > 0) {
+                            if (activeBullet) activeBullet.classList.remove("active");
+                            if (bullets[index]) {
+                                bullets[index].classList.add("active");
+                                activeBullet = bullets[index];
+                            }
+                            bullets.forEach((bullet, i) => {
+                                bullet.setAttribute("aria-selected", i === index ? "true" : "false");
+                            });
+                        }
+                        
+                    }
+                });
+                
+                // On initialization, center the slider (changed from 2 to 1 for 3-slide display)
+                // Add extra delay for dynamic content to ensure proper centering
+                setTimeout(() => {
+                    loop.toIndex(1, { duration: 0.01 });
+                }, 100);
 
             function startAutoplay() {
                 if (autoplayDuration > 0 && !autoplay) {
