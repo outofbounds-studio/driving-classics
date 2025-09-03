@@ -269,14 +269,14 @@
                             elementsToAnimate = split.lines;
                     }
                     
-                    // Set initial state
+                    // Set initial state - ensure elements are hidden
                     gsap.set(elementsToAnimate, { 
                         y: "100%", 
                         opacity: 0,
                         visibility: 'visible'
                     });
                     
-                    // Create reveal animation with unique ScrollTrigger
+                    // Create reveal animation with improved ScrollTrigger
                     gsap.fromTo(elementsToAnimate, 
                         { 
                             y: "100%", 
@@ -292,11 +292,12 @@
                             stagger: 0.1,
                             scrollTrigger: {
                                 trigger: heading,
-                                start: "top 85%",
-                                end: "bottom 15%",
+                                start: "top 90%",
+                                end: "bottom 10%",
                                 toggleActions: "play none none none",
                                 markers: false,
-                                id: `heading-${index}`
+                                id: `heading-${index}`,
+                                once: true
                             }
                         }
                     );
