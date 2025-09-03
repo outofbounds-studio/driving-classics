@@ -313,7 +313,7 @@
     function initSliders() {
         // Wait for Collection List content to be fully rendered
         setTimeout(() => {
-            const sliderWrappers = document.querySelectorAll('.slider-wrapper');
+            const sliderWrappers = document.querySelectorAll('.centered-slider-group');
             console.log('Found slider wrappers:', sliderWrappers.length);
 
             sliderWrappers.forEach((sliderWrapper, index) => {
@@ -383,6 +383,10 @@
                         },
                         init: function () {
                             console.log(`Slider ${index}: Swiper initialized successfully`);
+                            console.log(`Slider ${index}: Navigation buttons found:`, {
+                                next: sliderWrapper.querySelector('.swiper-next'),
+                                prev: sliderWrapper.querySelector('.swiper-prev')
+                            });
                         }
                     }
                 });
