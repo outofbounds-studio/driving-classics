@@ -104,12 +104,7 @@
         const navBg = document.querySelector('.nav-bg');
         const pageBg = document.querySelector('.page-bg');
         
-        if (!heroSection) {
-            console.log('Hero section not found, skipping scroll-based nav colors');
-            return;
-        }
-        
-        // Set nav to dark by default
+        // Set nav to dark by default (always)
         if (nav) nav.style.color = 'var(--color-dark)';
         navButtons.forEach(button => {
             button.style.borderColor = 'var(--color-dark)';
@@ -120,6 +115,14 @@
                 button.style.color = '#FFF';
             }
         });
+        
+        console.log('Nav set to dark theme by default');
+        
+        // Only add ScrollTrigger if hero section exists
+        if (!heroSection) {
+            console.log('No hero section found, nav will remain dark');
+            return;
+        }
         
         // Create ScrollTrigger for nav color changes
         ScrollTrigger.create({
