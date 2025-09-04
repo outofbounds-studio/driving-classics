@@ -109,28 +109,25 @@
             return;
         }
         
+        // Set nav to dark by default
+        if (nav) nav.style.color = 'var(--color-dark)';
+        navButtons.forEach(button => {
+            button.style.borderColor = 'var(--color-dark)';
+            button.style.color = 'var(--color-dark)';
+            if (button.classList.contains('is--primary')) {
+                button.style.backgroundColor = 'var(--color-dark)';
+                button.style.borderColor = 'var(--color-dark)';
+                button.style.color = '#FFF';
+            }
+        });
+        
         // Create ScrollTrigger for nav color changes
         ScrollTrigger.create({
             trigger: heroSection,
-            start: "bottom top",
+            start: "top bottom",
             end: "bottom top",
             onEnter: () => {
-                // Apply the same styles as dropdown hover (without nav-bg)
-                if (nav) nav.style.color = 'var(--color-dark)';
-                navButtons.forEach(button => {
-                    button.style.borderColor = 'var(--color-dark)';
-                    button.style.color = 'var(--color-dark)';
-                    if (button.classList.contains('is--primary')) {
-                        button.style.backgroundColor = 'var(--color-dark)';
-                        button.style.borderColor = 'var(--color-dark)';
-                        button.style.color = '#FFF';
-                    }
-                });
-                
-                console.log('Nav colors changed to dark theme');
-            },
-            onLeaveBack: () => {
-                // Revert to original styles (without nav-bg)
+                // Revert to light theme when over hero section
                 if (nav) nav.style.color = '';
                 navButtons.forEach(button => {
                     button.style.borderColor = '';
@@ -142,7 +139,52 @@
                     }
                 });
                 
-                console.log('Nav colors reverted to light theme');
+                console.log('Nav colors changed to light theme (over hero)');
+            },
+            onLeave: () => {
+                // Apply dark theme when leaving hero section
+                if (nav) nav.style.color = 'var(--color-dark)';
+                navButtons.forEach(button => {
+                    button.style.borderColor = 'var(--color-dark)';
+                    button.style.color = 'var(--color-dark)';
+                    if (button.classList.contains('is--primary')) {
+                        button.style.backgroundColor = 'var(--color-dark)';
+                        button.style.borderColor = 'var(--color-dark)';
+                        button.style.color = '#FFF';
+                    }
+                });
+                
+                console.log('Nav colors changed to dark theme (left hero)');
+            },
+            onEnterBack: () => {
+                // Revert to light theme when scrolling back to hero
+                if (nav) nav.style.color = '';
+                navButtons.forEach(button => {
+                    button.style.borderColor = '';
+                    button.style.color = '';
+                    if (button.classList.contains('is--primary')) {
+                        button.style.backgroundColor = '';
+                        button.style.borderColor = '';
+                        button.style.color = '';
+                    }
+                });
+                
+                console.log('Nav colors changed to light theme (back to hero)');
+            },
+            onLeaveBack: () => {
+                // Apply dark theme when scrolling away from hero
+                if (nav) nav.style.color = 'var(--color-dark)';
+                navButtons.forEach(button => {
+                    button.style.borderColor = 'var(--color-dark)';
+                    button.style.color = 'var(--color-dark)';
+                    if (button.classList.contains('is--primary')) {
+                        button.style.backgroundColor = 'var(--color-dark)';
+                        button.style.borderColor = 'var(--color-dark)';
+                        button.style.color = '#FFF';
+                    }
+                });
+                
+                console.log('Nav colors changed to dark theme (away from hero)');
             }
         });
     }
