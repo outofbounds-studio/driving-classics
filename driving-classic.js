@@ -34,6 +34,7 @@
             initMaskedTextReveal();
             initSliders();
             initAccordionCSS();
+            initBasicFormValidation();
             
         } catch (error) {
             console.error('Error initializing Driving Classic:', error);
@@ -624,6 +625,158 @@
         }
     }
 
+    // Basic form validation system
+    function initBasicFormValidation() {
+        try {
+            console.log('Initializing basic form validation system...');
+            
+            const forms = document.querySelectorAll('[data-form-validate]');
+            console.log('Found forms to validate:', forms.length);
+
+            forms.forEach((form, formIndex) => {
+                const fields = form.querySelectorAll('[data-validate] input, [data-validate] textarea');
+                const submitButtonDiv = form.querySelector('[data-submit]'); // The div wrapping the submit button
+                const submitInput = submitButtonDiv?.querySelector('input[type="submit"]'); // The actual submit button
+
+                console.log(`Form ${formIndex}: Found ${fields.length} fields, submit button:`, !!submitButtonDiv);
+
+                // Capture the form load time
+                const formLoadTime = new Date().getTime(); // Timestamp when the form was loaded
+
+                // Function to validate individual fields (input or textarea)
+                const validateField = (field) => {
+                    const parent = field.closest('[data-validate]'); // Get the parent div
+                    const minLength = field.getAttribute('min');
+                    const maxLength = field.getAttribute('max');
+                    const type = field.getAttribute('type');
+                    let isValid = true;
+
+                    // Check if the field has content
+                    if (field.value.trim() !== '') {
+                        parent.classList.add('is--filled');
+                    } else {
+                        parent.classList.remove('is--filled');
+                    }
+
+                    // Validation logic for min and max length
+                    if (minLength && field.value.length < minLength) {
+                        isValid = false;
+                    }
+
+                    if (maxLength && field.value.length > maxLength) {
+                        isValid = false;
+                    }
+
+                    // Validation logic for email input type
+                    if (type === 'email' && field.value.trim() !== '' && !/\S+@\S+\.\S+/.test(field.value)) {
+                        isValid = false;
+                    }
+
+                    // Add or remove success/error classes on the parent div
+                    if (isValid) {
+                        parent.classList.remove('is--error');
+                        parent.classList.add('is--success');
+                    } else {
+                        parent.classList.remove('is--success');
+                        parent.classList.add('is--error');
+                    }
+
+                    return isValid;
+                };
+
+                // Function to start live validation for a field
+                const startLiveValidation = (field) => {
+                    field.addEventListener('input', function () {
+                        validateField(field);
+                    });
+                };
+
+                // Function to validate and start live validation for all fields, focusing on the first field with an error
+                const validateAndStartLiveValidationForAll = () => {
+                    let allValid = true;
+                    let firstInvalidField = null;
+
+                    fields.forEach((field) => {
+                        const valid = validateField(field);
+                        if (!valid && !firstInvalidField) {
+                            firstInvalidField = field; // Track the first invalid field
+                        }
+                        if (!valid) {
+                            allValid = false;
+                        }
+                        startLiveValidation(field); // Start live validation for all fields
+                    });
+
+                    // If there is an invalid field, focus on the first one
+                    if (firstInvalidField) {
+                        firstInvalidField.focus();
+                    }
+
+                    return allValid;
+                };
+
+                // Anti-spam: Check if form was filled too quickly
+                const isSpam = () => {
+                    const currentTime = new Date().getTime();
+                    const timeDifference = (currentTime - formLoadTime) / 1000; // Convert milliseconds to seconds
+                    return timeDifference < 5; // Return true if form is filled within 5 seconds
+                };
+
+                // Handle clicking the custom submit button
+                if (submitButtonDiv && submitInput) {
+                    submitButtonDiv.addEventListener('click', function () {
+                        console.log(`Form ${formIndex}: Submit button clicked`);
+                        
+                        // Validate the form first
+                        if (validateAndStartLiveValidationForAll()) {
+                            // Only check for spam after all fields are valid
+                            if (isSpam()) {
+                                console.log(`Form ${formIndex}: Spam detected - submission blocked`);
+                                alert('Form submitted too quickly. Please try again.');
+                                return; // Stop form submission
+                            }
+                            console.log(`Form ${formIndex}: Validation passed, submitting form`);
+                            submitInput.click(); // Simulate a click on the <input type="submit">
+                        } else {
+                            console.log(`Form ${formIndex}: Validation failed`);
+                        }
+                    });
+                }
+
+                // Handle pressing the "Enter" key
+                form.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                        event.preventDefault(); // Prevent the default form submission
+                        console.log(`Form ${formIndex}: Enter key pressed`);
+
+                        // Validate the form first
+                        if (validateAndStartLiveValidationForAll()) {
+                            // Only check for spam after all fields are valid
+                            if (isSpam()) {
+                                console.log(`Form ${formIndex}: Spam detected - submission blocked`);
+                                alert('Form submitted too quickly. Please try again.');
+                                return; // Stop form submission
+                            }
+                            console.log(`Form ${formIndex}: Validation passed, submitting form`);
+                            if (submitInput) {
+                                submitInput.click(); // Trigger our custom form submission
+                            }
+                        } else {
+                            console.log(`Form ${formIndex}: Validation failed`);
+                        }
+                    }
+                });
+
+                console.log(`Form ${formIndex}: Form validation initialized successfully`);
+            });
+            
+            console.log('Basic form validation system initialized successfully');
+            
+        } catch (error) {
+            console.error('Error initializing basic form validation system:', error);
+        }
+    }
+
     // Utility functions
     function isElementInViewport(el) {
         const rect = el.getBoundingClientRect();
@@ -743,6 +896,35 @@
                     const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
                     console.log(`Accordion ${i}: ${toggles.length} toggles, ${statuses.length} status elements, closeSiblings: ${closeSiblings}`);
                 });
+            }
+        },
+        formValidation: {
+            init: initBasicFormValidation,
+            test: function() {
+                console.log('Testing form validation system...');
+                const forms = document.querySelectorAll('[data-form-validate]');
+                console.log('Forms found:', forms.length);
+                forms.forEach((form, i) => {
+                    const fields = form.querySelectorAll('[data-validate] input, [data-validate] textarea');
+                    const submitButtonDiv = form.querySelector('[data-submit]');
+                    const submitInput = submitButtonDiv?.querySelector('input[type="submit"]');
+                    console.log(`Form ${i}: ${fields.length} fields, submit button div: ${!!submitButtonDiv}, submit input: ${!!submitInput}`);
+                });
+            },
+            validateForm: function(formIndex = 0) {
+                const forms = document.querySelectorAll('[data-form-validate]');
+                if (forms[formIndex]) {
+                    const fields = forms[formIndex].querySelectorAll('[data-validate] input, [data-validate] textarea');
+                    console.log(`Manually validating form ${formIndex}...`);
+                    fields.forEach((field, i) => {
+                        const parent = field.closest('[data-validate]');
+                        const value = field.value.trim();
+                        const hasContent = value !== '';
+                        const isEmail = field.getAttribute('type') === 'email';
+                        const isValidEmail = !isEmail || value === '' || /\S+@\S+\.\S+/.test(value);
+                        console.log(`Field ${i}: "${field.name || field.id || 'unnamed'}" = "${value}", filled: ${hasContent}, valid: ${isValidEmail}`);
+                    });
+                }
             }
         }
     };
