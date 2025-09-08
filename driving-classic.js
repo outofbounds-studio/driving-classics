@@ -100,25 +100,63 @@
 
     // Scroll-based navigation color changes
     function initScrollBasedNavColors() {
-        const heroSection = document.querySelector('.home-hero') || document.querySelector('[data-hero-section]');
+        // Look for various hero section selectors
+        const heroSection = document.querySelector('.home-hero') || 
+                           document.querySelector('[data-hero-section]') ||
+                           document.querySelector('.page-hero') ||
+                           document.querySelector('.hero-section') ||
+                           document.querySelector('[data-page-hero]');
+        
         const nav = document.querySelector('.nav');
         const navButtons = document.querySelectorAll('.nav-button');
         const navBg = document.querySelector('.nav-bg');
         const pageBg = document.querySelector('.page-bg');
         
-        // Set nav to dark by default (always)
-        if (nav) nav.style.color = 'var(--color-dark)';
-        navButtons.forEach(button => {
-            button.style.borderColor = 'var(--color-dark)';
-            button.style.color = 'var(--color-dark)';
-            if (button.classList.contains('is--primary')) {
-                button.style.backgroundColor = 'var(--color-dark)';
+        // Function to apply dark theme
+        const applyDarkTheme = () => {
+            if (nav) nav.style.color = 'var(--color-dark)';
+            navButtons.forEach(button => {
                 button.style.borderColor = 'var(--color-dark)';
-                button.style.color = '#FFF';
-            }
-        });
+                button.style.color = 'var(--color-dark)';
+                if (button.classList.contains('is--primary')) {
+                    button.style.backgroundColor = 'var(--color-dark)';
+                    button.style.borderColor = 'var(--color-dark)';
+                    button.style.color = '#FFF';
+                }
+            });
+        };
         
-        console.log('Nav set to dark theme by default');
+        // Function to apply light theme
+        const applyLightTheme = () => {
+            if (nav) nav.style.color = '';
+            navButtons.forEach(button => {
+                button.style.borderColor = '';
+                button.style.color = '';
+                if (button.classList.contains('is--primary')) {
+                    button.style.backgroundColor = '';
+                    button.style.borderColor = '';
+                    button.style.color = '';
+                }
+            });
+        };
+        
+        // Check if we're on a page that should start with light nav
+        const isHeroPage = heroSection && (
+            heroSection.classList.contains('home-hero') ||
+            heroSection.hasAttribute('data-hero-section') ||
+            heroSection.classList.contains('page-hero') ||
+            heroSection.classList.contains('hero-section') ||
+            heroSection.hasAttribute('data-page-hero')
+        );
+        
+        // Set initial nav color based on page type
+        if (isHeroPage) {
+            applyLightTheme();
+            console.log('Nav set to light theme (hero page detected)');
+        } else {
+            applyDarkTheme();
+            console.log('Nav set to dark theme (no hero page)');
+        }
         
         // Only add ScrollTrigger if hero section exists
         if (!heroSection) {
@@ -132,63 +170,19 @@
             start: "top bottom",
             end: "bottom top",
             onEnter: () => {
-                // Revert to light theme when over hero section
-                if (nav) nav.style.color = '';
-                navButtons.forEach(button => {
-                    button.style.borderColor = '';
-                    button.style.color = '';
-                    if (button.classList.contains('is--primary')) {
-                        button.style.backgroundColor = '';
-                        button.style.borderColor = '';
-                        button.style.color = '';
-                    }
-                });
-                
+                applyLightTheme();
                 console.log('Nav colors changed to light theme (over hero)');
             },
             onLeave: () => {
-                // Apply dark theme when leaving hero section
-                if (nav) nav.style.color = 'var(--color-dark)';
-                navButtons.forEach(button => {
-                    button.style.borderColor = 'var(--color-dark)';
-                    button.style.color = 'var(--color-dark)';
-                    if (button.classList.contains('is--primary')) {
-                        button.style.backgroundColor = 'var(--color-dark)';
-                        button.style.borderColor = 'var(--color-dark)';
-                        button.style.color = '#FFF';
-                    }
-                });
-                
+                applyDarkTheme();
                 console.log('Nav colors changed to dark theme (left hero)');
             },
             onEnterBack: () => {
-                // Revert to light theme when scrolling back to hero
-                if (nav) nav.style.color = '';
-                navButtons.forEach(button => {
-                    button.style.borderColor = '';
-                    button.style.color = '';
-                    if (button.classList.contains('is--primary')) {
-                        button.style.backgroundColor = '';
-                        button.style.borderColor = '';
-                        button.style.color = '';
-                    }
-                });
-                
+                applyLightTheme();
                 console.log('Nav colors changed to light theme (back to hero)');
             },
             onLeaveBack: () => {
-                // Apply dark theme when scrolling away from hero
-                if (nav) nav.style.color = 'var(--color-dark)';
-                navButtons.forEach(button => {
-                    button.style.borderColor = 'var(--color-dark)';
-                    button.style.color = 'var(--color-dark)';
-                    if (button.classList.contains('is--primary')) {
-                        button.style.backgroundColor = 'var(--color-dark)';
-                        button.style.borderColor = 'var(--color-dark)';
-                        button.style.color = '#FFF';
-                    }
-                });
-                
+                applyDarkTheme();
                 console.log('Nav colors changed to dark theme (away from hero)');
             }
         });
