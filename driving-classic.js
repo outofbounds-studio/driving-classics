@@ -33,6 +33,7 @@
             setupSmoothScrolling();
             initMaskedTextReveal();
             initSliders();
+            initAccordionCSS();
             
         } catch (error) {
             console.error('Error initializing Driving Classic:', error);
@@ -583,6 +584,46 @@
         }, 1000); // Wait 1000ms for Collection List to fully render
     }
 
+    // Accordion CSS system
+    function initAccordionCSS() {
+        try {
+            console.log('Initializing accordion CSS system...');
+            
+            document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
+                const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+                console.log('Accordion found with closeSiblings:', closeSiblings);
+
+                accordion.addEventListener('click', (event) => {
+                    const toggle = event.target.closest('[data-accordion-toggle]');
+                    if (!toggle) return; // Exit if the clicked element is not a toggle
+
+                    const singleAccordion = toggle.closest('[data-accordion-status]');
+                    if (!singleAccordion) return; // Exit if no accordion container is found
+
+                    const isActive = singleAccordion.getAttribute('data-accordion-status') === 'active';
+                    singleAccordion.setAttribute('data-accordion-status', isActive ? 'not-active' : 'active');
+                    
+                    console.log(`Accordion toggled: ${isActive ? 'closed' : 'opened'}`);
+                    
+                    // When [data-accordion-close-siblings="true"]
+                    if (closeSiblings && !isActive) {
+                        accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
+                            if (sibling !== singleAccordion) {
+                                sibling.setAttribute('data-accordion-status', 'not-active');
+                                console.log('Closed sibling accordion');
+                            }
+                        });
+                    }
+                });
+            });
+            
+            console.log('Accordion CSS system initialized successfully');
+            
+        } catch (error) {
+            console.error('Error initializing accordion CSS system:', error);
+        }
+    }
+
     // Utility functions
     function isElementInViewport(el) {
         const rect = el.getBoundingClientRect();
@@ -687,6 +728,20 @@
                         const rect = slide.getBoundingClientRect();
                         console.log(`  Slide ${slideIndex}: transform="${transform}", active=${isActive}, left=${rect.left}, width=${rect.width}`);
                     });
+                });
+            }
+        },
+        accordionCSS: {
+            init: initAccordionCSS,
+            test: function() {
+                console.log('Testing accordion CSS system...');
+                const accordions = document.querySelectorAll('[data-accordion-css-init]');
+                console.log('Accordion containers found:', accordions.length);
+                accordions.forEach((accordion, i) => {
+                    const toggles = accordion.querySelectorAll('[data-accordion-toggle]');
+                    const statuses = accordion.querySelectorAll('[data-accordion-status]');
+                    const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+                    console.log(`Accordion ${i}: ${toggles.length} toggles, ${statuses.length} status elements, closeSiblings: ${closeSiblings}`);
                 });
             }
         }
