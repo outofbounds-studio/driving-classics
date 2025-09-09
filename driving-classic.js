@@ -459,15 +459,51 @@
                 }
             };
             
-            // Initialize after fonts load (following Osmo recommendation)
+            // Initialize after fonts load and collection lists are rendered
+            const initializeAfterLoad = () => {
+                console.log('Initializing text reveal after load...');
+                initializeTextReveal();
+            };
+            
+            // Wait for fonts to load
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(() => {
-                    console.log('Fonts loaded, initializing text reveal...');
-                    initializeTextReveal();
+                    console.log('Fonts loaded, waiting for collection lists...');
+                    // Wait additional time for Webflow collection lists to render
+                    setTimeout(initializeAfterLoad, 1000);
                 });
             } else {
-                // Fallback if fonts.ready is not available
-                initializeTextReveal();
+                // Fallback - wait longer for collection lists
+                setTimeout(initializeAfterLoad, 1500);
+            }
+            
+            // Also initialize on window load as backup
+            window.addEventListener('load', () => {
+                console.log('Window loaded, reinitializing text reveal...');
+                setTimeout(initializeAfterLoad, 500);
+            });
+            
+            // Monitor collection lists to detect when they're fully rendered
+            const collectionLists = document.querySelectorAll('.collection-list');
+            if (collectionLists.length > 0) {
+                console.log(`Found ${collectionLists.length} collection lists, monitoring for full render...`);
+                
+                collectionLists.forEach((list, index) => {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                console.log(`Collection list ${index} is visible, refreshing ScrollTrigger...`);
+                                setTimeout(() => {
+                                    ScrollTrigger.refresh();
+                                    console.log('ScrollTrigger refreshed after collection list render');
+                                }, 300);
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.1 });
+                    
+                    observer.observe(list);
+                });
             }
             
         } catch (error) {
