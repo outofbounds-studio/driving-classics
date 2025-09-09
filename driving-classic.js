@@ -385,7 +385,7 @@
                                     ease: 'expo.out',
                                     scrollTrigger: {
                                         trigger: heading,
-                                        start: 'clamp(top 80%)',
+                                        start: 'top 85%',
                                         once: true
                                     }
                                 });
