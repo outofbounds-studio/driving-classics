@@ -507,6 +507,13 @@
             // Initialize after fonts load and collection lists are rendered
             const initializeAfterLoad = () => {
                 console.log('Initializing text reveal after load...');
+                
+                // Check if already initialized
+                if (window.DrivingClassic && window.DrivingClassic.textRevealInitialized) {
+                    console.log('Text reveal already initialized, skipping initializeAfterLoad...');
+                    return;
+                }
+                
                 initializeTextReveal();
             };
             
