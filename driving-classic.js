@@ -318,12 +318,22 @@
         }
     }
 
-    // Masked text reveal system
+    // Masked text reveal system (following Osmo best practices)
     function initMaskedTextReveal() {
         try {
             console.log('Initializing masked text reveal system...');
-                
-            // Function to initialize text reveal with retry logic
+            
+            // Register GSAP plugins
+            gsap.registerPlugin(SplitText, ScrollTrigger);
+            
+            // Configuration options (following Osmo pattern)
+            const splitConfig = {
+                lines: { duration: 0.8, stagger: 0.08 },
+                words: { duration: 0.6, stagger: 0.06 },
+                chars: { duration: 0.4, stagger: 0.01 }
+            };
+            
+            // Function to initialize text reveal
             const initializeTextReveal = (retryCount = 0) => {
                 const headings = document.querySelectorAll('[data-split="heading"]');
                 console.log(`Found ${headings.length} headings to animate (attempt ${retryCount + 1})`);
@@ -336,17 +346,6 @@
                     return;
                 }
                 
-                // Register GSAP plugins
-                gsap.registerPlugin(SplitText, ScrollTrigger);
-                
-                // Create custom ease
-                CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
-                
-                const splitConfig = {
-                    type: "chars,words,lines",
-                    linesClass: "overflow-hidden"
-                };
-                
                 headings.forEach((heading, index) => {
                     try {
                         // Ensure element is visible and has content
@@ -355,82 +354,40 @@
                             return;
                         }
                         
-                        // Force element to be visible for GSAP
-                        gsap.set(heading, { 
-                            visibility: 'visible',
-                            opacity: 1,
-                            display: 'block'
-                        });
+                        // Reset CSS visibility (following Osmo FOUC prevention)
+                        gsap.set(heading, { autoAlpha: 1 });
                         
-                        // Wait a frame to ensure element is rendered
-                        requestAnimationFrame(() => {
-                            try {
-                    const split = new SplitText(heading, splitConfig);
-                    const revealType = heading.getAttribute('data-split-reveal') || 'lines';
-                    
-                    let elementsToAnimate;
-                    switch (revealType) {
-                        case 'lines':
-                            elementsToAnimate = split.lines;
-                            break;
-                        case 'words':
-                            elementsToAnimate = split.words;
-                            break;
-                        case 'chars':
-                            elementsToAnimate = split.chars;
-                            break;
-                        default:
-                            elementsToAnimate = split.lines;
-                    }
+                        // Find the split type, default is 'lines'
+                        const type = heading.dataset.splitReveal || 'lines';
+                        const typesToSplit = 
+                            type === 'lines' ? ['lines'] :
+                            type === 'words' ? ['lines', 'words'] :
+                            ['lines', 'words', 'chars'];
+                        
+                        // Split the text using Osmo's approach
+                        SplitText.create(heading, {
+                            type: typesToSplit.join(', '), // split into required elements
+                            mask: 'lines', // wrap each line in an overflow:hidden div
+                            autoSplit: true,
+                            linesClass: 'line',
+                            wordsClass: 'word',
+                            charsClass: 'letter',
+                            onSplit: function(instance) {
+                                const targets = instance[type]; // Register animation targets
+                                const config = splitConfig[type]; // Find matching duration and stagger
                                 
-                                if (!elementsToAnimate || elementsToAnimate.length === 0) {
-                                    console.warn(`Heading ${index}: No elements to animate after split`);
-                                    return;
-                    }
-                    
-                    // Set initial state - ensure elements are hidden
-                    gsap.set(elementsToAnimate, { 
-                        y: "100%", 
-                        opacity: 0,
-                        visibility: 'visible'
-                    });
-                    
-                    // Create reveal animation with improved ScrollTrigger
-                    gsap.fromTo(elementsToAnimate, 
-                        { 
-                            y: "100%", 
-                            opacity: 0,
-                            visibility: 'visible'
-                        },
-                        {
-                            y: "0%",
-                            opacity: 1,
-                            visibility: 'visible',
-                            duration: 1.2,
-                            ease: "osmo-ease",
-                            stagger: 0.1,
-                            scrollTrigger: {
-                                trigger: heading,
-                                            start: "top 80%",
-                                            end: "bottom 20%",
-                                            toggleActions: "play none none reverse",
-                                markers: false,
-                                id: `heading-${index}`,
-                                            once: false,
-                                            refreshPriority: -1,
-                                            invalidateOnRefresh: true
-                                        }
+                                console.log(`Heading ${index}: SplitText created ${targets.length} ${type} elements`);
+                                
+                                return gsap.from(targets, {
+                                    yPercent: 110,
+                                    duration: config.duration,
+                                    stagger: config.stagger,
+                                    ease: 'expo.out',
+                                    scrollTrigger: {
+                                        trigger: heading,
+                                        start: 'clamp(top 80%)',
+                                        once: true
                                     }
-                                );
-                                
-                                console.log(`Heading ${index}: Text reveal animation created for "${heading.textContent.substring(0, 30)}..." (${elementsToAnimate.length} elements)`);
-                                
-                            } catch (splitError) {
-                                console.error(`Heading ${index}: SplitText error:`, splitError);
-                                // Fallback: show the heading without animation
-                                gsap.set(heading, { 
-                                    opacity: 1,
-                                    visibility: 'visible'
                                 });
                             }
                         });
@@ -445,24 +402,18 @@
                     }
                 });
                 
-                // Refresh ScrollTrigger after all animations are created
-                setTimeout(() => {
-                    ScrollTrigger.refresh();
-                    console.log('ScrollTrigger refreshed for text reveal animations');
-                }, 100);
-                
                 console.log('Masked text reveal system initialized successfully');
             };
             
-            // Try to initialize immediately
-            initializeTextReveal();
-                
-            // Also try after fonts load (backup)
+            // Initialize after fonts load (following Osmo recommendation)
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(() => {
-                    console.log('Fonts loaded, re-checking text reveal...');
-                    setTimeout(() => initializeTextReveal(), 100);
-            });
+                    console.log('Fonts loaded, initializing text reveal...');
+                    initializeTextReveal();
+                });
+            } else {
+                // Fallback if fonts.ready is not available
+                initializeTextReveal();
             }
             
         } catch (error) {
@@ -958,17 +909,17 @@
                 const headings = document.querySelectorAll('[data-split="heading"]');
                 if (headings[headingIndex]) {
                     const heading = headings[headingIndex];
-                    const splitElements = heading.querySelectorAll('.split-line, .split-word, .split-char');
+                    const splitElements = heading.querySelectorAll('.line, .word, .letter');
                     
                     if (splitElements.length > 0) {
                         gsap.fromTo(splitElements, 
-                            { y: "100%", opacity: 0 },
+                            { yPercent: 110, opacity: 0 },
                             { 
-                                y: "0%", 
+                                yPercent: 0, 
                                 opacity: 1, 
-                                duration: 1.2, 
-                                ease: "osmo-ease", 
-                                stagger: 0.1 
+                                duration: 0.8, 
+                                ease: "expo.out", 
+                                stagger: 0.08 
                             }
                         );
                         console.log(`Force animated heading ${headingIndex} with ${splitElements.length} elements`);
