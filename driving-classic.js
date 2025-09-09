@@ -322,12 +322,12 @@
     function initMaskedTextReveal() {
         try {
             console.log('Initializing masked text reveal system...');
-            
-            // Register GSAP plugins
-            gsap.registerPlugin(SplitText, ScrollTrigger);
-            
+                
+                // Register GSAP plugins
+                gsap.registerPlugin(SplitText, ScrollTrigger);
+                
             // Configuration options (following Osmo pattern)
-            const splitConfig = {
+                const splitConfig = {
                 lines: { duration: 0.8, stagger: 0.08 },
                 words: { duration: 0.6, stagger: 0.06 },
                 chars: { duration: 0.4, stagger: 0.01 }
@@ -383,11 +383,11 @@
                                     duration: config.duration,
                                     stagger: config.stagger,
                                     ease: 'expo.out',
-                                    scrollTrigger: {
-                                        trigger: heading,
+                            scrollTrigger: {
+                                trigger: heading,
                                         start: 'top bottom-=100px',
-                                        once: true
-                                    }
+                                once: true
+                            }
                                 });
                             }
                         });
@@ -403,6 +403,60 @@
                 });
                 
                 console.log('Masked text reveal system initialized successfully');
+                
+                // Refresh ScrollTrigger after all animations are created
+                setTimeout(() => {
+                    ScrollTrigger.refresh();
+                    console.log('ScrollTrigger refreshed for text reveal animations');
+                }, 100);
+                
+                // Listen for Jetboost events to refresh ScrollTrigger
+                if (window.Jetboost) {
+                    console.log('Jetboost detected, setting up ScrollTrigger refresh listeners');
+                    
+                    // Refresh ScrollTrigger when Jetboost loads more content
+                    document.addEventListener('jetboost:loaded', () => {
+                        console.log('Jetboost content loaded, refreshing ScrollTrigger');
+                        setTimeout(() => {
+                            ScrollTrigger.refresh();
+                            console.log('ScrollTrigger refreshed after Jetboost load');
+                        }, 200);
+                    });
+                    
+                    // Also listen for any DOM changes that might affect layout
+                    const observer = new MutationObserver((mutations) => {
+                        let shouldRefresh = false;
+                        mutations.forEach((mutation) => {
+                            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                                // Check if any added nodes contain headings or affect layout
+                                mutation.addedNodes.forEach((node) => {
+                                    if (node.nodeType === 1) { // Element node
+                                        if (node.querySelector && (
+                                            node.querySelector('[data-split="heading"]') ||
+                                            node.classList.contains('collection-list') ||
+                                            node.classList.contains('jetboost-item')
+                                        )) {
+                                            shouldRefresh = true;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        if (shouldRefresh) {
+                            console.log('DOM changes detected, refreshing ScrollTrigger');
+                            setTimeout(() => {
+                                ScrollTrigger.refresh();
+                            }, 100);
+                        }
+                    });
+                    
+                    // Start observing
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
             };
             
             // Initialize after fonts load (following Osmo recommendation)
@@ -867,6 +921,12 @@
             refresh: function() {
                 console.log('Refreshing ScrollTrigger for text reveal...');
                 ScrollTrigger.refresh();
+            },
+            forceRefresh: function() {
+                console.log('Force refreshing ScrollTrigger and reinitializing text reveal...');
+                ScrollTrigger.refresh();
+                // Reinitialize text reveal
+                initMaskedTextReveal();
             },
             debug: function() {
                 console.log('=== TEXT REVEAL DEBUG ===');
