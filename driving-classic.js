@@ -386,7 +386,7 @@
                                 if (!elementsToAnimate || elementsToAnimate.length === 0) {
                                     console.warn(`Heading ${index}: No elements to animate after split`);
                                     return;
-                                }
+                    }
                     
                     // Set initial state - ensure elements are hidden
                     gsap.set(elementsToAnimate, { 
@@ -411,13 +411,14 @@
                             stagger: 0.1,
                             scrollTrigger: {
                                 trigger: heading,
-                                            start: "top 85%",
-                                            end: "bottom 15%",
-                                toggleActions: "play none none none",
+                                            start: "top 80%",
+                                            end: "bottom 20%",
+                                            toggleActions: "play none none reverse",
                                 markers: false,
                                 id: `heading-${index}`,
-                                            once: true,
-                                            refreshPriority: -1
+                                            once: false,
+                                            refreshPriority: -1,
+                                            invalidateOnRefresh: true
                                         }
                                     }
                                 );
@@ -915,6 +916,66 @@
             refresh: function() {
                 console.log('Refreshing ScrollTrigger for text reveal...');
                 ScrollTrigger.refresh();
+            },
+            debug: function() {
+                console.log('=== TEXT REVEAL DEBUG ===');
+                const headings = document.querySelectorAll('[data-split="heading"]');
+                console.log('Total headings found:', headings.length);
+                
+                headings.forEach((heading, i) => {
+                    const rect = heading.getBoundingClientRect();
+                    const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+                    const scrollY = window.scrollY;
+                    const elementTop = rect.top + scrollY;
+                    const elementBottom = rect.bottom + scrollY;
+                    
+                    console.log(`Heading ${i}:`, {
+                        text: heading.textContent.substring(0, 30) + '...',
+                        isInViewport: isInViewport,
+                        rect: rect,
+                        scrollY: scrollY,
+                        elementTop: elementTop,
+                        elementBottom: elementBottom,
+                        windowHeight: window.innerHeight
+                    });
+                });
+                
+                console.log('ScrollTrigger instances:', ScrollTrigger.getAll().length);
+                ScrollTrigger.getAll().forEach((st, i) => {
+                    if (st.vars.id && st.vars.id.startsWith('heading-')) {
+                        console.log(`ScrollTrigger ${i}:`, {
+                            id: st.vars.id,
+                            trigger: st.trigger,
+                            start: st.start,
+                            end: st.end,
+                            isActive: st.isActive,
+                            progress: st.progress
+                        });
+                    }
+                });
+            },
+            forceAnimate: function(headingIndex = 0) {
+                const headings = document.querySelectorAll('[data-split="heading"]');
+                if (headings[headingIndex]) {
+                    const heading = headings[headingIndex];
+                    const splitElements = heading.querySelectorAll('.split-line, .split-word, .split-char');
+                    
+                    if (splitElements.length > 0) {
+                        gsap.fromTo(splitElements, 
+                            { y: "100%", opacity: 0 },
+                            { 
+                                y: "0%", 
+                                opacity: 1, 
+                                duration: 1.2, 
+                                ease: "osmo-ease", 
+                                stagger: 0.1 
+                            }
+                        );
+                        console.log(`Force animated heading ${headingIndex} with ${splitElements.length} elements`);
+                    } else {
+                        console.log(`Heading ${headingIndex}: No split elements found`);
+                    }
+                }
             }
         },
         sliders: {
