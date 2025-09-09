@@ -322,6 +322,12 @@
     function initMaskedTextReveal() {
         try {
             console.log('Initializing masked text reveal system...');
+            
+            // Prevent multiple initializations
+            if (window.DrivingClassic && window.DrivingClassic.textRevealInitialized) {
+                console.log('Text reveal already initialized, skipping...');
+                return;
+            }
                 
                 // Register GSAP plugins
                 gsap.registerPlugin(SplitText, ScrollTrigger);
@@ -403,6 +409,10 @@
                 });
                 
                 console.log('Masked text reveal system initialized successfully');
+                
+                // Mark as initialized to prevent re-initialization
+                window.DrivingClassic = window.DrivingClassic || {};
+                window.DrivingClassic.textRevealInitialized = true;
                 
                 // Refresh ScrollTrigger after all animations are created
                 setTimeout(() => {
@@ -960,6 +970,10 @@
             },
             forceRefresh: function() {
                 console.log('Force refreshing ScrollTrigger and reinitializing text reveal...');
+                // Reset initialization flag
+                if (window.DrivingClassic) {
+                    window.DrivingClassic.textRevealInitialized = false;
+                }
                 ScrollTrigger.refresh();
                 // Reinitialize text reveal
                 initMaskedTextReveal();
