@@ -114,16 +114,16 @@
         
         // Function to apply dark theme
         const applyDarkTheme = () => {
-            if (nav) nav.style.color = 'var(--color-dark)';
-            navButtons.forEach(button => {
+        if (nav) nav.style.color = 'var(--color-dark)';
+        navButtons.forEach(button => {
+            button.style.borderColor = 'var(--color-dark)';
+            button.style.color = 'var(--color-dark)';
+            if (button.classList.contains('is--primary')) {
+                button.style.backgroundColor = 'var(--color-dark)';
                 button.style.borderColor = 'var(--color-dark)';
-                button.style.color = 'var(--color-dark)';
-                if (button.classList.contains('is--primary')) {
-                    button.style.backgroundColor = 'var(--color-dark)';
-                    button.style.borderColor = 'var(--color-dark)';
-                    button.style.color = '#FFF';
-                }
-            });
+                button.style.color = '#FFF';
+            }
+        });
         };
         
         // Function to apply light theme
@@ -321,13 +321,20 @@
     // Masked text reveal system
     function initMaskedTextReveal() {
         try {
-            // Wait for fonts to load
-            document.fonts.ready.then(() => {
-                console.log('Fonts loaded, initializing text reveal...');
+            console.log('Initializing masked text reveal system...');
                 
+            // Function to initialize text reveal with retry logic
+            const initializeTextReveal = (retryCount = 0) => {
                 const headings = document.querySelectorAll('[data-split="heading"]');
+                console.log(`Found ${headings.length} headings to animate (attempt ${retryCount + 1})`);
                 
-                if (headings.length === 0) return;
+                if (headings.length === 0) {
+                    if (retryCount < 3) {
+                        console.log('No headings found, retrying in 500ms...');
+                        setTimeout(() => initializeTextReveal(retryCount + 1), 500);
+                    }
+                    return;
+                }
                 
                 // Register GSAP plugins
                 gsap.registerPlugin(SplitText, ScrollTrigger);
@@ -341,9 +348,23 @@
                 };
                 
                 headings.forEach((heading, index) => {
-                    // Ensure element is visible for GSAP to split it
-                    gsap.set(heading, { visibility: 'visible' });
-                    
+                    try {
+                        // Ensure element is visible and has content
+                        if (!heading.textContent.trim()) {
+                            console.warn(`Heading ${index}: No text content found`);
+                            return;
+                        }
+                        
+                        // Force element to be visible for GSAP
+                        gsap.set(heading, { 
+                            visibility: 'visible',
+                            opacity: 1,
+                            display: 'block'
+                        });
+                        
+                        // Wait a frame to ensure element is rendered
+                        requestAnimationFrame(() => {
+                            try {
                     const split = new SplitText(heading, splitConfig);
                     const revealType = heading.getAttribute('data-split-reveal') || 'lines';
                     
@@ -361,6 +382,11 @@
                         default:
                             elementsToAnimate = split.lines;
                     }
+                                
+                                if (!elementsToAnimate || elementsToAnimate.length === 0) {
+                                    console.warn(`Heading ${index}: No elements to animate after split`);
+                                    return;
+                                }
                     
                     // Set initial state - ensure elements are hidden
                     gsap.set(elementsToAnimate, { 
@@ -385,22 +411,58 @@
                             stagger: 0.1,
                             scrollTrigger: {
                                 trigger: heading,
-                                start: "top 90%",
-                                end: "bottom 10%",
+                                            start: "top 85%",
+                                            end: "bottom 15%",
                                 toggleActions: "play none none none",
                                 markers: false,
                                 id: `heading-${index}`,
-                                once: true
+                                            once: true,
+                                            refreshPriority: -1
+                                        }
+                                    }
+                                );
+                                
+                                console.log(`Heading ${index}: Text reveal animation created for "${heading.textContent.substring(0, 30)}..." (${elementsToAnimate.length} elements)`);
+                                
+                            } catch (splitError) {
+                                console.error(`Heading ${index}: SplitText error:`, splitError);
+                                // Fallback: show the heading without animation
+                                gsap.set(heading, { 
+                                    opacity: 1,
+                                    visibility: 'visible'
+                                });
                             }
-                        }
-                    );
-                    
-                    console.log(`Heading ${index}: Text reveal animation created for "${heading.textContent.substring(0, 30)}..."`);
+                        });
+                        
+                    } catch (error) {
+                        console.error(`Heading ${index}: Error processing heading:`, error);
+                        // Fallback: show the heading without animation
+                        gsap.set(heading, { 
+                            opacity: 1,
+                            visibility: 'visible'
+                        });
+                    }
                 });
                 
-                console.log('Masked text reveal system initialized successfully');
+                // Refresh ScrollTrigger after all animations are created
+                setTimeout(() => {
+                    ScrollTrigger.refresh();
+                    console.log('ScrollTrigger refreshed for text reveal animations');
+                }, 100);
                 
+                console.log('Masked text reveal system initialized successfully');
+            };
+            
+            // Try to initialize immediately
+            initializeTextReveal();
+                
+            // Also try after fonts load (backup)
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                    console.log('Fonts loaded, re-checking text reveal...');
+                    setTimeout(() => initializeTextReveal(), 100);
             });
+            }
             
         } catch (error) {
             console.error('Error initializing masked text reveal:', error);
@@ -826,7 +888,34 @@
             init: setupSmoothScrolling
         },
         maskedTextReveal: {
-            init: initMaskedTextReveal
+            init: initMaskedTextReveal,
+            test: function() {
+                console.log('Testing masked text reveal system...');
+                const headings = document.querySelectorAll('[data-split="heading"]');
+                console.log('Headings found:', headings.length);
+                headings.forEach((heading, i) => {
+                    const text = heading.textContent.trim();
+                    const revealType = heading.getAttribute('data-split-reveal') || 'lines';
+                    const isVisible = heading.style.visibility !== 'hidden' && heading.style.display !== 'none';
+                    console.log(`Heading ${i}: "${text.substring(0, 30)}...", reveal: ${revealType}, visible: ${isVisible}`);
+                });
+            },
+            forceShow: function(headingIndex = 0) {
+                const headings = document.querySelectorAll('[data-split="heading"]');
+                if (headings[headingIndex]) {
+                    const heading = headings[headingIndex];
+                    gsap.set(heading, { 
+                        opacity: 1,
+                        visibility: 'visible',
+                        y: 0
+                    });
+                    console.log(`Forced heading ${headingIndex} to show`);
+                }
+            },
+            refresh: function() {
+                console.log('Refreshing ScrollTrigger for text reveal...');
+                ScrollTrigger.refresh();
+            }
         },
         sliders: {
             init: initSliders,
