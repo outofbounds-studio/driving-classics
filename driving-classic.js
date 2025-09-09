@@ -384,17 +384,34 @@
                                 
                                 console.log(`Heading ${index}: SplitText created ${targets.length} ${type} elements`);
                                 
-                                return gsap.from(targets, {
-                                    yPercent: 110,
-                                    duration: config.duration,
-                                    stagger: config.stagger,
-                                    ease: 'expo.out',
-                            scrollTrigger: {
-                                trigger: heading,
-                                        start: 'top bottom-=100px',
-                                once: true
-                            }
-                                });
+                                // Check if heading is already in viewport
+                                const rect = heading.getBoundingClientRect();
+                                const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+                                
+                                if (isInViewport) {
+                                    console.log(`Heading ${index}: Already in viewport, animating immediately`);
+                                    // Animate immediately without ScrollTrigger
+                                    return gsap.from(targets, {
+                                        yPercent: 110,
+                                        duration: config.duration,
+                                        stagger: config.stagger,
+                                        ease: 'expo.out'
+                                    });
+                                } else {
+                                    console.log(`Heading ${index}: Not in viewport, setting up ScrollTrigger`);
+                                    // Use ScrollTrigger for headings not yet visible
+                                    return gsap.from(targets, {
+                                        yPercent: 110,
+                                        duration: config.duration,
+                                        stagger: config.stagger,
+                                        ease: 'expo.out',
+                                        scrollTrigger: {
+                                            trigger: heading,
+                                            start: 'top bottom-=100px',
+                                            once: true
+                                        }
+                                    });
+                                }
                             }
                         });
                         
