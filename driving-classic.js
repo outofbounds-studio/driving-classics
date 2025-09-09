@@ -341,8 +341,9 @@
             
             // Function to initialize text reveal
             const initializeTextReveal = (retryCount = 0) => {
+                console.log(`=== INITIALIZING TEXT REVEAL (attempt ${retryCount + 1}) ===`);
                 const headings = document.querySelectorAll('[data-split="heading"]');
-                console.log(`Found ${headings.length} headings to animate (attempt ${retryCount + 1})`);
+                console.log(`Found ${headings.length} headings to animate`);
                 
                 if (headings.length === 0) {
                     if (retryCount < 3) {
@@ -352,8 +353,18 @@
                     return;
                 }
                 
+                // Log all headings found
+                headings.forEach((heading, i) => {
+                    const rect = heading.getBoundingClientRect();
+                    const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+                    console.log(`Heading ${i}: "${heading.textContent.substring(0, 30)}..." - In viewport: ${isInViewport}, Rect: top=${rect.top}, bottom=${rect.bottom}, windowHeight=${window.innerHeight}`);
+                });
+                
                 headings.forEach((heading, index) => {
                     try {
+                        console.log(`\n--- PROCESSING HEADING ${index} ---`);
+                        console.log(`Heading ${index}: Text: "${heading.textContent.trim().substring(0, 50)}..."`);
+                        
                         // Ensure element is visible and has content
                         if (!heading.textContent.trim()) {
                             console.warn(`Heading ${index}: No text content found`);
@@ -362,6 +373,7 @@
                         
                         // Reset CSS visibility (following Osmo FOUC prevention)
                         gsap.set(heading, { autoAlpha: 1 });
+                        console.log(`Heading ${index}: Set autoAlpha: 1`);
                         
                         // Find the split type, default is 'lines'
                         const type = heading.dataset.splitReveal || 'lines';
@@ -369,6 +381,8 @@
                             type === 'lines' ? ['lines'] :
                             type === 'words' ? ['lines', 'words'] :
                             ['lines', 'words', 'chars'];
+                        
+                        console.log(`Heading ${index}: Split type: ${type}, Types to split: ${typesToSplit.join(', ')}`);
                         
                         // Split the text using Osmo's approach
                         SplitText.create(heading, {
@@ -383,13 +397,16 @@
                                 const config = splitConfig[type]; // Find matching duration and stagger
                                 
                                 console.log(`Heading ${index}: SplitText created ${targets.length} ${type} elements`);
+                                console.log(`Heading ${index}: Animation config: duration=${config.duration}, stagger=${config.stagger}`);
                                 
                                 // Check if heading is already in viewport
                                 const rect = heading.getBoundingClientRect();
                                 const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
                                 
+                                console.log(`Heading ${index}: Viewport check - top=${rect.top}, bottom=${rect.bottom}, windowHeight=${window.innerHeight}, isInViewport=${isInViewport}`);
+                                
                                 if (isInViewport) {
-                                    console.log(`Heading ${index}: Already in viewport, animating immediately`);
+                                    console.log(`Heading ${index}: ✅ ALREADY IN VIEWPORT - Animating immediately (NO ScrollTrigger)`);
                                     // Animate immediately without ScrollTrigger
                                     return gsap.from(targets, {
                                         yPercent: 110,
@@ -398,18 +415,18 @@
                                         ease: 'expo.out'
                                     });
                                 } else {
-                                    console.log(`Heading ${index}: Not in viewport, setting up ScrollTrigger`);
+                                    console.log(`Heading ${index}: ⏳ NOT IN VIEWPORT - Setting up ScrollTrigger`);
                                     // Use ScrollTrigger for headings not yet visible
                                     return gsap.from(targets, {
                                         yPercent: 110,
                                         duration: config.duration,
                                         stagger: config.stagger,
                                         ease: 'expo.out',
-                                        scrollTrigger: {
-                                            trigger: heading,
+                            scrollTrigger: {
+                                trigger: heading,
                                             start: 'top bottom-=100px',
-                                            once: true
-                                        }
+                                once: true
+                            }
                                     });
                                 }
                             }
@@ -433,8 +450,9 @@
                 
                 // Refresh ScrollTrigger after all animations are created
                 setTimeout(() => {
+                    console.log('🔄 REFRESHING ScrollTrigger after all animations created...');
                     ScrollTrigger.refresh();
-                    console.log('ScrollTrigger refreshed for text reveal animations');
+                    console.log('✅ ScrollTrigger refreshed for text reveal animations');
                 }, 100);
                 
                 // Listen for Jetboost events to refresh ScrollTrigger
@@ -513,16 +531,16 @@
             // Monitor collection lists to detect when they're fully rendered
             const collectionLists = document.querySelectorAll('.collection-list');
             if (collectionLists.length > 0) {
-                console.log(`Found ${collectionLists.length} collection lists, monitoring for full render...`);
+                console.log(`📋 Found ${collectionLists.length} collection lists, monitoring for full render...`);
                 
                 collectionLists.forEach((list, index) => {
                     const observer = new IntersectionObserver((entries) => {
                         entries.forEach(entry => {
                             if (entry.isIntersecting) {
-                                console.log(`Collection list ${index} is visible, refreshing ScrollTrigger...`);
+                                console.log(`📋 Collection list ${index} is visible, refreshing ScrollTrigger...`);
                                 setTimeout(() => {
                                     ScrollTrigger.refresh();
-                                    console.log('ScrollTrigger refreshed after collection list render');
+                                    console.log('✅ ScrollTrigger refreshed after collection list render');
                                 }, 300);
                                 observer.unobserve(entry.target);
                             }
