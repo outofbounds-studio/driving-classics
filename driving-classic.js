@@ -58,21 +58,19 @@
         
         menuButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const menuStatus = button.getAttribute('data-menu-status');
-                const targetMenu = button.getAttribute('data-menu-target');
+                const nav = document.querySelector('.nav');
+                const currentStatus = nav ? nav.getAttribute('data-menu-status') : 'closed';
                 
-                if (menuStatus === 'closed') {
+                if (currentStatus === 'closed') {
+                    // Open menu
+                    if (nav) nav.setAttribute('data-menu-status', 'open');
                     button.setAttribute('data-menu-status', 'open');
-                    if (targetMenu) {
-                        const menu = document.querySelector(targetMenu);
-                        if (menu) menu.style.display = 'block';
-                    }
+                    console.log('Mobile menu opened');
                 } else {
+                    // Close menu
+                    if (nav) nav.setAttribute('data-menu-status', 'closed');
                     button.setAttribute('data-menu-status', 'closed');
-                    if (targetMenu) {
-                        const menu = document.querySelector(targetMenu);
-                        if (menu) menu.style.display = 'none';
-                    }
+                    console.log('Mobile menu closed');
                 }
             });
         });
@@ -83,17 +81,13 @@
         
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('mouseenter', () => {
-                const dropdown = toggle.querySelector('.nav-dropdown');
-                if (dropdown) {
-                    dropdown.style.display = 'block';
-                }
+                toggle.setAttribute('data-dropdown-toggle', 'open');
+                console.log('Desktop dropdown opened');
             });
             
             toggle.addEventListener('mouseleave', () => {
-                const dropdown = toggle.querySelector('.nav-dropdown');
-                if (dropdown) {
-                    dropdown.style.display = 'none';
-                }
+                toggle.setAttribute('data-dropdown-toggle', 'closed');
+                console.log('Desktop dropdown closed');
             });
         });
     }
