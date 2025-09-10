@@ -119,9 +119,9 @@
                     button.style.color = '#FFF';
                 }
             });
-            // Apply dark theme to burger menu lines
+            // Apply dark theme to burger menu lines (white for contrast)
             menuButtonLines.forEach(line => {
-                line.style.backgroundColor = 'var(--color-dark)';
+                line.style.backgroundColor = '#FFF';
             });
         };
         
