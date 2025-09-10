@@ -105,19 +105,24 @@
         const navButtons = document.querySelectorAll('.nav-button');
         const navBg = document.querySelector('.nav-bg');
         const pageBg = document.querySelector('.page-bg');
+        const menuButtonLines = document.querySelectorAll('.menu-button__line');
         
         // Function to apply dark theme
         const applyDarkTheme = () => {
-        if (nav) nav.style.color = 'var(--color-dark)';
-        navButtons.forEach(button => {
-            button.style.borderColor = 'var(--color-dark)';
-            button.style.color = 'var(--color-dark)';
-            if (button.classList.contains('is--primary')) {
-                button.style.backgroundColor = 'var(--color-dark)';
+            if (nav) nav.style.color = 'var(--color-dark)';
+            navButtons.forEach(button => {
                 button.style.borderColor = 'var(--color-dark)';
-                button.style.color = '#FFF';
-            }
-        });
+                button.style.color = 'var(--color-dark)';
+                if (button.classList.contains('is--primary')) {
+                    button.style.backgroundColor = 'var(--color-dark)';
+                    button.style.borderColor = 'var(--color-dark)';
+                    button.style.color = '#FFF';
+                }
+            });
+            // Apply dark theme to burger menu lines
+            menuButtonLines.forEach(line => {
+                line.style.backgroundColor = 'var(--color-dark)';
+            });
         };
         
         // Function to apply light theme
@@ -131,6 +136,10 @@
                     button.style.borderColor = '';
                     button.style.color = '';
                 }
+            });
+            // Apply light theme to burger menu lines
+            menuButtonLines.forEach(line => {
+                line.style.backgroundColor = '';
             });
         };
         
