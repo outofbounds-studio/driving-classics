@@ -109,16 +109,16 @@
         
         // Function to apply dark theme
         const applyDarkTheme = () => {
-            if (nav) nav.style.color = 'var(--color-dark)';
-            navButtons.forEach(button => {
+        if (nav) nav.style.color = 'var(--color-dark)';
+        navButtons.forEach(button => {
+            button.style.borderColor = 'var(--color-dark)';
+            button.style.color = 'var(--color-dark)';
+            if (button.classList.contains('is--primary')) {
+                button.style.backgroundColor = 'var(--color-dark)';
                 button.style.borderColor = 'var(--color-dark)';
-                button.style.color = 'var(--color-dark)';
-                if (button.classList.contains('is--primary')) {
-                    button.style.backgroundColor = 'var(--color-dark)';
-                    button.style.borderColor = 'var(--color-dark)';
-                    button.style.color = '#FFF';
-                }
-            });
+                button.style.color = '#FFF';
+            }
+        });
             // Apply dark theme to burger menu lines (white for contrast)
             menuButtonLines.forEach(line => {
                 line.style.backgroundColor = '#FFF';
@@ -630,24 +630,15 @@
                     breakpoints: {
                         480: {
                             slidesPerView: 1,
-                            spaceBetween: 0,
-                            centeredSlides: true,
-                            slidesOffsetBefore: 0,
-                            slidesOffsetAfter: 0
+                            spaceBetween: "1%"
                         },
                         768: {
                             slidesPerView: 2,
-                            spaceBetween: "4%",
-                            centeredSlides: true,
-                            slidesOffsetBefore: 0,
-                            slidesOffsetAfter: 0
+                            spaceBetween: "4%"
                         },
                         992: {
                             slidesPerView: 2.5,
-                            spaceBetween: "2%",
-                            centeredSlides: true,
-                            slidesOffsetBefore: 0,
-                            slidesOffsetAfter: 0
+                            spaceBetween: "2%"
                         }
                     },
                     pagination: {
@@ -716,28 +707,6 @@
 
                 // Store swiper instance for potential future use
                 swiperElement.swiper = swiper;
-                
-                // Add CSS to ensure edge-to-edge on mobile
-                const style = document.createElement('style');
-                style.textContent = `
-                    @media screen and (max-width: 767px) {
-                        .swiper {
-                            margin-left: 0 !important;
-                            margin-right: 0 !important;
-                            padding-left: 0 !important;
-                            padding-right: 0 !important;
-                        }
-                        .swiper-wrapper {
-                            margin-left: 0 !important;
-                            margin-right: 0 !important;
-                        }
-                        .swiper-slide {
-                            margin-left: 0 !important;
-                            margin-right: 0 !important;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
                 
                 // Ensure Link Block clicks work with Swiper
                 const linkBlocks = swiperElement.querySelectorAll('a[href]');
