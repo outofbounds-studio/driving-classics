@@ -80,14 +80,38 @@
         const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
         
         dropdownToggles.forEach(toggle => {
+            const dropdown = toggle.nextElementSibling; // Get the dropdown that follows the toggle
+            
+            if (!dropdown) return;
+            
+            // Open dropdown on hover
             toggle.addEventListener('mouseenter', () => {
                 toggle.setAttribute('data-dropdown-toggle', 'open');
                 console.log('Desktop dropdown opened');
             });
             
-            toggle.addEventListener('mouseleave', () => {
+            // Close dropdown when leaving both toggle AND dropdown
+            const closeDropdown = () => {
                 toggle.setAttribute('data-dropdown-toggle', 'closed');
                 console.log('Desktop dropdown closed');
+            };
+            
+            // Close when leaving the toggle (but only if not moving to dropdown)
+            toggle.addEventListener('mouseleave', (e) => {
+                const relatedTarget = e.relatedTarget;
+                // Only close if we're not moving to the dropdown
+                if (!dropdown.contains(relatedTarget)) {
+                    closeDropdown();
+                }
+            });
+            
+            // Close when leaving the dropdown
+            dropdown.addEventListener('mouseleave', (e) => {
+                const relatedTarget = e.relatedTarget;
+                // Only close if we're not moving back to the toggle
+                if (!toggle.contains(relatedTarget)) {
+                    closeDropdown();
+                }
             });
         });
     }
