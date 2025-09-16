@@ -544,16 +544,43 @@
                 initializeTextReveal();
             };
             
+            // Smart initialization that adapts to collection list size
+            const smartInitialize = () => {
+                const collectionLists = document.querySelectorAll('.collection-list');
+                let maxWaitTime = 1000; // Default wait time
+                
+                if (collectionLists.length > 0) {
+                    // Check if collection lists have content
+                    const hasContent = Array.from(collectionLists).some(list => list.children.length > 0);
+                    if (hasContent) {
+                        // Collection lists already have content, reduce wait time
+                        maxWaitTime = 300;
+                        console.log('Collection lists already have content, using shorter wait time');
+                    } else {
+                        // Check collection list size to determine appropriate wait time
+                        const totalItems = Array.from(collectionLists).reduce((total, list) => {
+                            return total + list.children.length;
+                        }, 0);
+                        
+                        if (totalItems <= 6) {
+                            maxWaitTime = 500; // Shorter wait for smaller collections
+                            console.log(`Small collection detected (${totalItems} items), using shorter wait time`);
+                        }
+                    }
+                }
+                
+                setTimeout(initializeAfterLoad, maxWaitTime);
+            };
+            
             // Wait for fonts to load
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(() => {
-                    console.log('Fonts loaded, waiting for collection lists...');
-                    // Wait additional time for Webflow collection lists to render
-                    setTimeout(initializeAfterLoad, 1000);
+                    console.log('Fonts loaded, using smart initialization...');
+                    smartInitialize();
                 });
             } else {
-                // Fallback - wait longer for collection lists
-                setTimeout(initializeAfterLoad, 1500);
+                // Fallback - use smart initialization
+                smartInitialize();
             }
             
             // Also initialize on window load as backup
@@ -572,10 +599,13 @@
                         entries.forEach(entry => {
                             if (entry.isIntersecting) {
                                 console.log(`📋 Collection list ${index} is visible, refreshing ScrollTrigger...`);
+                                // Use shorter delay for smaller collections
+                                const itemCount = list.children.length;
+                                const delay = itemCount <= 6 ? 150 : 300;
                                 setTimeout(() => {
                                     ScrollTrigger.refresh();
-                                    console.log('✅ ScrollTrigger refreshed after collection list render');
-                                }, 300);
+                                    console.log(`✅ ScrollTrigger refreshed after collection list render (${itemCount} items)`);
+                                }, delay);
                                 observer.unobserve(entry.target);
                             }
                         });
