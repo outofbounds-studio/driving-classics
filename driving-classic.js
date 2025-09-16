@@ -544,16 +544,30 @@
                 initializeTextReveal();
             };
             
+            // Check if collection lists are already rendered and initialize immediately
+            const collectionLists = document.querySelectorAll('.collection-list');
+            const hasCollectionLists = collectionLists.length > 0;
+            
+            if (hasCollectionLists) {
+                console.log(`📋 Found ${collectionLists.length} collection lists, checking if already rendered...`);
+                // Check if collection lists have content (indicating they're already rendered)
+                const hasContent = Array.from(collectionLists).some(list => list.children.length > 0);
+                if (hasContent) {
+                    console.log('Collection lists already have content, initializing text reveal immediately...');
+                    setTimeout(initializeAfterLoad, 100);
+                }
+            }
+            
             // Wait for fonts to load
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(() => {
                     console.log('Fonts loaded, waiting for collection lists...');
-                    // Wait additional time for Webflow collection lists to render
-                    setTimeout(initializeAfterLoad, 1000);
+                    // Reduced wait time for faster collection list rendering (6 cars load faster)
+                    setTimeout(initializeAfterLoad, 300);
                 });
             } else {
-                // Fallback - wait longer for collection lists
-                setTimeout(initializeAfterLoad, 1500);
+                // Fallback - reduced wait time for faster initialization
+                setTimeout(initializeAfterLoad, 500);
             }
             
             // Also initialize on window load as backup
@@ -562,20 +576,20 @@
                 setTimeout(initializeAfterLoad, 500);
             });
             
-            // Monitor collection lists to detect when they're fully rendered
-            const collectionLists = document.querySelectorAll('.collection-list');
-            if (collectionLists.length > 0) {
-                console.log(`📋 Found ${collectionLists.length} collection lists, monitoring for full render...`);
+            // Monitor collection lists to detect when they're fully rendered (if not already done)
+            if (hasCollectionLists) {
+                console.log(`📋 Monitoring ${collectionLists.length} collection lists for full render...`);
                 
                 collectionLists.forEach((list, index) => {
                     const observer = new IntersectionObserver((entries) => {
                         entries.forEach(entry => {
                             if (entry.isIntersecting) {
                                 console.log(`📋 Collection list ${index} is visible, refreshing ScrollTrigger...`);
+                                // Reduced delay for faster ScrollTrigger refresh with fewer items
                                 setTimeout(() => {
                                     ScrollTrigger.refresh();
                                     console.log('✅ ScrollTrigger refreshed after collection list render');
-                                }, 300);
+                                }, 100);
                                 observer.unobserve(entry.target);
                             }
                         });
