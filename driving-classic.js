@@ -125,6 +125,9 @@
                            document.querySelector('.hero-section') ||
                            document.querySelector('[data-page-hero]');
         
+        // Look for footer sections
+        const footerSections = document.querySelectorAll('.footer');
+        
         const nav = document.querySelector('.nav');
         const navButtons = document.querySelectorAll('.nav-button');
         const navBg = document.querySelector('.nav-bg');
@@ -185,34 +188,65 @@
             console.log('Nav set to dark theme (no hero page)');
         }
         
-        // Only add ScrollTrigger if hero section exists
-        if (!heroSection) {
-            console.log('No hero section found, nav will remain dark');
+        // Only return early if neither hero nor footer sections exist
+        if (!heroSection && footerSections.length === 0) {
+            console.log('No hero or footer sections found, nav will remain dark');
             return;
         }
         
-        // Create ScrollTrigger for nav color changes
-        ScrollTrigger.create({
-            trigger: heroSection,
-            start: "top bottom",
-            end: "bottom top",
-            onEnter: () => {
-                applyLightTheme();
-                console.log('Nav colors changed to light theme (over hero)');
-            },
-            onLeave: () => {
-                applyDarkTheme();
-                console.log('Nav colors changed to dark theme (left hero)');
-            },
-            onEnterBack: () => {
-                applyLightTheme();
-                console.log('Nav colors changed to light theme (back to hero)');
-            },
-            onLeaveBack: () => {
-                applyDarkTheme();
-                console.log('Nav colors changed to dark theme (away from hero)');
-            }
-        });
+        // Create ScrollTrigger for nav color changes over hero section
+        if (heroSection) {
+            ScrollTrigger.create({
+                trigger: heroSection,
+                start: "top bottom",
+                end: "bottom top",
+                onEnter: () => {
+                    applyLightTheme();
+                    console.log('Nav colors changed to light theme (over hero)');
+                },
+                onLeave: () => {
+                    applyDarkTheme();
+                    console.log('Nav colors changed to dark theme (left hero)');
+                },
+                onEnterBack: () => {
+                    applyLightTheme();
+                    console.log('Nav colors changed to light theme (back to hero)');
+                },
+                onLeaveBack: () => {
+                    applyDarkTheme();
+                    console.log('Nav colors changed to dark theme (away from hero)');
+                }
+            });
+        }
+        
+        // Create ScrollTrigger for nav color changes over footer sections
+        if (footerSections.length > 0) {
+            console.log(`Found ${footerSections.length} footer sections, setting up nav color changes`);
+            
+            footerSections.forEach((footer, index) => {
+                ScrollTrigger.create({
+                    trigger: footer,
+                    start: "top bottom",
+                    end: "bottom top",
+                    onEnter: () => {
+                        applyLightTheme();
+                        console.log(`Nav colors changed to light theme (over footer ${index + 1})`);
+                    },
+                    onLeave: () => {
+                        applyDarkTheme();
+                        console.log(`Nav colors changed to dark theme (left footer ${index + 1})`);
+                    },
+                    onEnterBack: () => {
+                        applyLightTheme();
+                        console.log(`Nav colors changed to light theme (back to footer ${index + 1})`);
+                    },
+                    onLeaveBack: () => {
+                        applyDarkTheme();
+                        console.log(`Nav colors changed to dark theme (away from footer ${index + 1})`);
+                    }
+                });
+            });
+        }
     }
 
     // Image cycle system
