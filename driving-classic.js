@@ -198,8 +198,8 @@
         if (heroSection) {
             ScrollTrigger.create({
                 trigger: heroSection,
-                start: "top bottom-=5em", // Trigger when hero's top reaches 5em from bottom of viewport (bottom of nav bar)
-                end: "bottom top+=5em", // End when hero's bottom reaches 5em from top of viewport
+                start: "top bottom-80px", // Trigger when hero's top reaches 80px from bottom of viewport (nav bar height)
+                end: "bottom top+80px", // End when hero's bottom reaches 80px from top of viewport
                 onEnter: () => {
                     applyLightTheme();
                     console.log('Nav colors changed to light theme (bottom of nav bar over hero)');
@@ -226,8 +226,8 @@
             footerSections.forEach((footer, index) => {
                 ScrollTrigger.create({
                     trigger: footer,
-                    start: "top top+=5em", // Trigger when footer's top reaches 5em from top of viewport (bottom of nav bar)
-                    end: "bottom top-=5em", // End when footer's bottom reaches 5em from top of viewport
+                    start: "top top+80px", // Trigger when footer's top reaches 80px from top of viewport (bottom of nav bar)
+                    end: "bottom top-80px", // End when footer's bottom reaches 80px from top of viewport
                     onEnter: () => {
                         applyLightTheme();
                         console.log(`Nav colors changed to light theme (bottom of nav bar over footer ${index + 1})`);
