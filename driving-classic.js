@@ -198,23 +198,23 @@
         if (heroSection) {
             ScrollTrigger.create({
                 trigger: heroSection,
-                start: "top bottom",
-                end: "bottom top",
+                start: "top bottom-=5em", // Trigger when hero's top reaches 5em from bottom of viewport (bottom of nav bar)
+                end: "bottom top+=5em", // End when hero's bottom reaches 5em from top of viewport
                 onEnter: () => {
                     applyLightTheme();
-                    console.log('Nav colors changed to light theme (over hero)');
+                    console.log('Nav colors changed to light theme (bottom of nav bar over hero)');
                 },
                 onLeave: () => {
                     applyDarkTheme();
-                    console.log('Nav colors changed to dark theme (left hero)');
+                    console.log('Nav colors changed to dark theme (bottom of nav bar left hero)');
                 },
                 onEnterBack: () => {
                     applyLightTheme();
-                    console.log('Nav colors changed to light theme (back to hero)');
+                    console.log('Nav colors changed to light theme (bottom of nav bar back over hero)');
                 },
                 onLeaveBack: () => {
                     applyDarkTheme();
-                    console.log('Nav colors changed to dark theme (away from hero)');
+                    console.log('Nav colors changed to dark theme (bottom of nav bar away from hero)');
                 }
             });
         }
@@ -226,23 +226,23 @@
             footerSections.forEach((footer, index) => {
                 ScrollTrigger.create({
                     trigger: footer,
-                    start: "top top", // Trigger when footer's top reaches the top of viewport (nav bar level)
-                    end: "bottom top", // End when footer's bottom reaches the top of viewport
+                    start: "top top+=5em", // Trigger when footer's top reaches 5em from top of viewport (bottom of nav bar)
+                    end: "bottom top-=5em", // End when footer's bottom reaches 5em from top of viewport
                     onEnter: () => {
                         applyLightTheme();
-                        console.log(`Nav colors changed to light theme (nav bar over footer ${index + 1})`);
+                        console.log(`Nav colors changed to light theme (bottom of nav bar over footer ${index + 1})`);
                     },
                     onLeave: () => {
                         applyDarkTheme();
-                        console.log(`Nav colors changed to dark theme (nav bar left footer ${index + 1})`);
+                        console.log(`Nav colors changed to dark theme (bottom of nav bar left footer ${index + 1})`);
                     },
                     onEnterBack: () => {
                         applyLightTheme();
-                        console.log(`Nav colors changed to light theme (nav bar back over footer ${index + 1})`);
+                        console.log(`Nav colors changed to light theme (bottom of nav bar back over footer ${index + 1})`);
                     },
                     onLeaveBack: () => {
                         applyDarkTheme();
-                        console.log(`Nav colors changed to dark theme (nav bar away from footer ${index + 1})`);
+                        console.log(`Nav colors changed to dark theme (bottom of nav bar away from footer ${index + 1})`);
                     }
                 });
             });
