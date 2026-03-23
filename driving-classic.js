@@ -35,6 +35,7 @@
             initSliders();
             initAccordionCSS();
             initBasicFormValidation();
+            initSalesStatusTagColors();
             
         } catch (error) {
             console.error('Error initializing Driving Classic:', error);
@@ -1015,6 +1016,50 @@
             
         } catch (error) {
             console.error('Error initializing basic form validation system:', error);
+        }
+    }
+
+    // Ensure CMS sales-status labels keep their intended colors on published pages
+    function initSalesStatusTagColors() {
+        try {
+            const statusWrappers = document.querySelectorAll('.sales-status-wrap');
+            if (!statusWrappers.length) return;
+
+            const classFallbackColors = {
+                'sales-status-sale-agreed': '#8b6f47',
+                'sales-status-under-offer': '#6f7f95',
+                'sales-status-coming-soon': '#6c7f6b',
+                'sales-status-recent-sale': '#7ca7d8'
+            };
+
+            statusWrappers.forEach((wrapper) => {
+                const statusLabel = wrapper.querySelector('.sales-status');
+                if (!statusLabel) return;
+
+                const colourSwatch = wrapper.querySelector('[class*="status-colour"]');
+                let resolvedColor = '';
+
+                if (colourSwatch) {
+                    const swatchColor = window.getComputedStyle(colourSwatch).backgroundColor;
+                    if (swatchColor && swatchColor !== 'rgba(0, 0, 0, 0)' && swatchColor !== 'transparent') {
+                        resolvedColor = swatchColor;
+                    }
+                }
+
+                if (!resolvedColor) {
+                    const matchingClass = Object.keys(classFallbackColors).find((cls) => wrapper.classList.contains(cls));
+                    if (matchingClass) {
+                        resolvedColor = classFallbackColors[matchingClass];
+                    }
+                }
+
+                if (resolvedColor) {
+                    // Use !important to override inline CMS color styles on published output.
+                    statusLabel.style.setProperty('color', resolvedColor, 'important');
+                }
+            });
+        } catch (error) {
+            console.error('Error applying sales-status tag colors:', error);
         }
     }
 
