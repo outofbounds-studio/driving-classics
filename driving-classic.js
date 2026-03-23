@@ -1033,29 +1033,37 @@
             };
 
             statusWrappers.forEach((wrapper) => {
-                const statusLabel = wrapper.querySelector('.sales-status');
-                if (!statusLabel) return;
+                const statusBlocks = wrapper.querySelectorAll(
+                    '.sales-status-sale-agreed, .sales-status-under-offer, .sales-status-coming-soon, .sales-status-recent-sale'
+                );
 
-                const colourSwatch = wrapper.querySelector('[class*="status-colour"]');
-                let resolvedColor = '';
+                statusBlocks.forEach((block) => {
+                    const statusLabel = block.querySelector('.sales-status');
+                    if (!statusLabel) return;
 
-                // Prefer wrapper status class to avoid bad inline CMS values on publish.
-                const matchingClass = Object.keys(classFallbackColors).find((cls) => wrapper.classList.contains(cls));
-                if (matchingClass) {
-                    resolvedColor = classFallbackColors[matchingClass];
-                }
+                    let resolvedColor = '';
 
-                if (!resolvedColor && colourSwatch) {
-                    const swatchColor = window.getComputedStyle(colourSwatch).backgroundColor;
-                    if (swatchColor && swatchColor !== 'rgba(0, 0, 0, 0)' && swatchColor !== 'transparent') {
-                        resolvedColor = swatchColor;
+                    // Prefer explicit status class mapping to avoid bad inline CMS publish values.
+                    const matchingClass = Object.keys(classFallbackColors).find((cls) => block.classList.contains(cls));
+                    if (matchingClass) {
+                        resolvedColor = classFallbackColors[matchingClass];
                     }
-                }
 
-                if (resolvedColor) {
-                    // Use !important to override inline CMS color styles on published output.
-                    statusLabel.style.setProperty('color', resolvedColor, 'important');
-                }
+                    if (!resolvedColor) {
+                        const colourSwatch = block.querySelector('[class*="status-colour"]');
+                        if (colourSwatch) {
+                            const swatchColor = window.getComputedStyle(colourSwatch).backgroundColor;
+                            if (swatchColor && swatchColor !== 'rgba(0, 0, 0, 0)' && swatchColor !== 'transparent') {
+                                resolvedColor = swatchColor;
+                            }
+                        }
+                    }
+
+                    if (resolvedColor) {
+                        // Use !important to override inline CMS color styles on published output.
+                        statusLabel.style.setProperty('color', resolvedColor, 'important');
+                    }
+                });
             });
         } catch (error) {
             console.error('Error applying sales-status tag colors:', error);
