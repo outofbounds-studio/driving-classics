@@ -1039,17 +1039,16 @@
                 const colourSwatch = wrapper.querySelector('[class*="status-colour"]');
                 let resolvedColor = '';
 
-                if (colourSwatch) {
+                // Prefer wrapper status class to avoid bad inline CMS values on publish.
+                const matchingClass = Object.keys(classFallbackColors).find((cls) => wrapper.classList.contains(cls));
+                if (matchingClass) {
+                    resolvedColor = classFallbackColors[matchingClass];
+                }
+
+                if (!resolvedColor && colourSwatch) {
                     const swatchColor = window.getComputedStyle(colourSwatch).backgroundColor;
                     if (swatchColor && swatchColor !== 'rgba(0, 0, 0, 0)' && swatchColor !== 'transparent') {
                         resolvedColor = swatchColor;
-                    }
-                }
-
-                if (!resolvedColor) {
-                    const matchingClass = Object.keys(classFallbackColors).find((cls) => wrapper.classList.contains(cls));
-                    if (matchingClass) {
-                        resolvedColor = classFallbackColors[matchingClass];
                     }
                 }
 
