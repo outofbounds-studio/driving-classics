@@ -1025,44 +1025,14 @@
             const statusWrappers = document.querySelectorAll('.sales-status-wrap');
             if (!statusWrappers.length) return;
 
-            const classFallbackColors = {
-                'sales-status-sale-agreed': '#8b6f47',
-                'sales-status-under-offer': '#6f7f95',
-                'sales-status-coming-soon': '#6c7f6b',
-                'sales-status-recent-sale': '#7ca7d8'
-            };
+            const forceLabelColor = '#f80000';
 
             statusWrappers.forEach((wrapper) => {
-                const statusBlocks = wrapper.querySelectorAll(
-                    '.sales-status-sale-agreed, .sales-status-under-offer, .sales-status-coming-soon, .sales-status-recent-sale'
-                );
+                const labels = wrapper.querySelectorAll('.sales-status');
 
-                statusBlocks.forEach((block) => {
-                    const statusLabel = block.querySelector('.sales-status');
-                    if (!statusLabel) return;
-
-                    let resolvedColor = '';
-
-                    // Prefer explicit status class mapping to avoid bad inline CMS publish values.
-                    const matchingClass = Object.keys(classFallbackColors).find((cls) => block.classList.contains(cls));
-                    if (matchingClass) {
-                        resolvedColor = classFallbackColors[matchingClass];
-                    }
-
-                    if (!resolvedColor) {
-                        const colourSwatch = block.querySelector('[class*="status-colour"]');
-                        if (colourSwatch) {
-                            const swatchColor = window.getComputedStyle(colourSwatch).backgroundColor;
-                            if (swatchColor && swatchColor !== 'rgba(0, 0, 0, 0)' && swatchColor !== 'transparent') {
-                                resolvedColor = swatchColor;
-                            }
-                        }
-                    }
-
-                    if (resolvedColor) {
-                        // Use !important to override inline CMS color styles on published output.
-                        statusLabel.style.setProperty('color', resolvedColor, 'important');
-                    }
+                labels.forEach((statusLabel) => {
+                    // Use !important to override inline CMS color styles on published output.
+                    statusLabel.style.setProperty('color', forceLabelColor, 'important');
                 });
             });
         } catch (error) {
